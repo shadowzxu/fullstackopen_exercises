@@ -1,8 +1,8 @@
 import Persons from './components/Persons'
 import Filter from './components/Filter'
+import personService from './services/persons'
 import PersonForm from './components/PersonForm'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,18 +12,12 @@ const App = () => {
 
   //fetch the initial state of persons data from json-server
   useEffect(() => {
-    // console.log('effect');
-
-    const eventHandler = response => {
-      // console.log('promise fullfilled');
-      setPersons(response.data);
-    }
-
-    const promise = axios.get('http://localhost:3001/persons');
-    promise.then(eventHandler)
+    personService.getAll().then(persons => {
+      setPersons(persons)
+    })
   }, [])
 
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault();
     console.log('button clicked', event.target);
 
@@ -37,13 +31,11 @@ const App = () => {
       number: newNumber.trim(),
       id: persons.length + 1
     }
-    // setPersons(persons.concat(person));
-    // setNewName('');
-    // setNewNumber('');
-    axios
-      .post('http://localhost:3001/persons', person)
-      .then(response => {
-        setPersons(persons.concat(response.data))
+
+    personService
+      .create(person)
+      .then(data => {
+        setPersons(persons.concat(data))
         setNewName('');
         setNewNumber('');
       })
@@ -64,8 +56,6 @@ const App = () => {
     setNewFilter(event.target.value);    
   }
 
-
-
   const fillteredPersons = newFilter ? 
     persons.filter((person) => person.name.toLowerCase().includes(newFilter.toLowerCase())) : persons;
 
@@ -78,7 +68,7 @@ const App = () => {
       <h3>add a new</h3>
       
       <PersonForm 
-        onSubmit = {addName} 
+        onSubmit = {addPerson} 
         name = {newName} handleNameChange = {handleNameChange} 
         number = {newNumber} handleNumberChange = {handleNumberChange} />
 
