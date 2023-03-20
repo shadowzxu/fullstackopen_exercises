@@ -25,12 +25,24 @@ const App = () => {
       return;
     }
 
-    if(persons.map((person) => person.name).find(name => name === newName.trim())){
-      alert(`${newName} is already added to phonebook`);
+    let person = persons.find(p => p.name === newName.trim());
+    if(person != null){
+      if(window.confirm(`${newName.trim()} is already added to phonebook, replace the old number with a new one?`)){
+        const newPerson = {...person, number: newNumber }
+        personService
+          .update(person.id, newPerson)
+          .then((data) => {
+            // console.log("update :", person);
+            setPersons(persons.map(p => p.id !== person.id ? p : data))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
+      
       return;
     }
     
-    const person = {
+    person = {
       name: newName.trim(),
       number: newNumber.trim(),
       id: persons.length + 1 + Date.now()
