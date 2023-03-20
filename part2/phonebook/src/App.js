@@ -21,6 +21,10 @@ const App = () => {
     event.preventDefault();
     console.log('button clicked', event.target);
 
+    if(newName.length === 0){
+      return;
+    }
+
     if(persons.map((person) => person.name).find(name => name === newName.trim())){
       alert(`${newName} is already added to phonebook`);
       return;
@@ -29,7 +33,7 @@ const App = () => {
     const person = {
       name: newName.trim(),
       number: newNumber.trim(),
-      id: persons.length + 1
+      id: persons.length + 1 + Date.now()
     }
 
     personService
@@ -39,6 +43,20 @@ const App = () => {
         setNewName('');
         setNewNumber('');
       })
+  }
+
+  const deletePerson = (event) => {
+    event.preventDefault();
+    // console.log('button clicked', event.target);
+
+    if(window.confirm(`Delete ${event.target.name}?`)){
+      personService.deletePerson(event.target.id)
+      .then(() => {
+        personService.getAll().then(persons => {
+          setPersons(persons)
+        })
+      });
+    }
   }
 
   const handleNameChange = (event) => {
@@ -73,7 +91,7 @@ const App = () => {
         number = {newNumber} handleNumberChange = {handleNumberChange} />
 
       <h3>Numbers</h3>
-      <Persons persons = {fillteredPersons} />
+      <Persons persons = {fillteredPersons} handleClickDeletePerson = {deletePerson}/>
     </div>
   )
 }
