@@ -2,6 +2,7 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import personService from './services/persons'
 import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
 import { useState, useEffect } from 'react'
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState({content: null, type:'INFO'})
 
   //fetch the initial state of persons data from json-server
   useEffect(() => {
@@ -36,6 +38,11 @@ const App = () => {
             setPersons(persons.map(p => p.id !== person.id ? p : data))
             setNewName('')
             setNewNumber('')
+
+            setMessage({content: `Updated ${person.name}`, type: 'INFO'})
+            setTimeout(() => {
+              setMessage({content: null, type: 'INFO'})
+            }, 3000)
           })
       }
       
@@ -54,6 +61,11 @@ const App = () => {
         setPersons(persons.concat(data))
         setNewName('');
         setNewNumber('');
+        
+        setMessage({content: `Added ${person.name}`, type: 'INFO'})
+        setTimeout(() => {
+          setMessage({content: null, type: 'INFO'})
+        }, 3000)
       })
   }
 
@@ -67,9 +79,15 @@ const App = () => {
         personService.getAll().then(persons => {
           setPersons(persons)
         })
-      });
-    }
+      })
+      .catch((error) => {
+        setMessage({content: `Information of ${event.target.name} has already been removed from server`, type: 'ERROR'})
+        setTimeout(() => {
+          setMessage({content: null, type: 'INFO'})
+        }, 3000)
+      })
   }
+}
 
   const handleNameChange = (event) => {
     // console.log(event.target.value);
@@ -92,6 +110,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message = {message.content} type = {message.type} />
       {/* <div>debug: {newName}</div> */}
       <Filter filter = {newFilter} handleFilterChange = {handleFilterChange}/>
       
