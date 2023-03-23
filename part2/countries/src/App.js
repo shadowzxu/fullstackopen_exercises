@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Display = ({ countries }) => {
+const Display = ({ countries, handleShowButtonClick }) => {
   
   if(countries.length === 1){
     const country = countries[0];
@@ -23,7 +23,7 @@ const Display = ({ countries }) => {
     <div>
         {countries.map((country) => 
             <p key = {country.name}> 
-                {country.name}
+                {country.name} <button onClick={handleShowButtonClick} name = {country.name}>show</button> 
             </p>)
         }
     </div>
@@ -53,13 +53,17 @@ const App = () => {
     setNewFilter(event.target.value);    
   }
 
+  const showCountry = (event) => {
+    setNewFilter(event.target.name);
+  }
+
   const filteredCountries = newFilter ? 
     countries.filter((country) => country.name.toLowerCase().includes(newFilter.toLowerCase())) : [];
 
   return (
     <div>
       <div>find countries: <input value={newFilter} onChange = {handleFilterChange}/></div>
-      <Display countries={filteredCountries} />
+      <Display countries={filteredCountries} handleShowButtonClick={showCountry}/>
     </div>
   )
 }
