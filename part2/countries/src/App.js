@@ -1,51 +1,19 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import Display from './components/Display';
+import Filter from './components/Filter';
+import countryServices from './services/countries';
+import weatherServices from './services/weather';
 
-const Display = ({ countries, weather, handleShowButtonClick }) => {
-  
-  if(countries.length === 1){
-    const country = countries[0];
-
-    return (
-      <div>
-        <h3>{country.name}</h3>
-        <p>capital: {country.capital}</p>
-        <p>area: {country.area}</p>
-        <ul>
-          {Object.values(country.languages)
-            .map((language) => <li key = {language}>{language}</li>)}
-        </ul>
-        <img src={country.image} alt=''></img>
-        
-        <h3>Weather in {weather.name}</h3>
-        <p>temperature: {weather.temp} Celcius</p>
-        <img src={weather.icon}></img>
-        <p>wind speed: {weather.wind} m/s</p>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-        {countries.map((country) => 
-            <p key = {country.name}> 
-                {country.name} <button onClick={handleShowButtonClick} name = {country.name}>show</button> 
-            </p>)
-        }
-    </div>
-  )
-}
 
 const App = () => {
-
   const [newFilter, setNewFilter] = useState('')
   const [countries, setCountries] = useState(null)
   const [weather, setWeather] = useState({name: "", temp: 0, wind: 0})
 
   useEffect(()=> {
-    axios.get('https://restcountries.com/v3.1/all')
-      .then(response => {
-        setCountries(response.data.map(country => {
+    countryServices.getAll()
+      .then(data => {
+        setCountries(data.map(country => {
           return {
             name: country.name.common,
             languages: country.languages,
@@ -57,20 +25,17 @@ const App = () => {
   },[])
 
   useEffect(() => {
-    const api_key = process.env.REACT_APP_API_KEY;
-    
     if(newFilter){
       const filteredCountries = countries.filter((country) => country.name.toLowerCase().includes(newFilter.toLowerCase()));
       const capital = filteredCountries.length > 0 ? filteredCountries[0].capital[0] : "";
       if(filteredCountries.length === 1 && (!weather || weather.name !== capital)){
         console.log('get weather for: ', capital)
-        axios
-          .get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}`)
-          .then(response => setWeather({
-            name: response.data.name,
-            temp: Math.round((response.data.main.temp - 273.15) * 100) / 100,
-            wind: response.data.wind.speed,
-            icon: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
+        weatherServices.getWeatherByCity(capital)
+          .then(data => setWeather({
+            name: data.name,
+            temp: Math.round((data.main.temp - 273.15) * 100) / 100,
+            wind: data.wind.speed,
+            icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
           }))
       }}
   }, [newFilter])
@@ -88,7 +53,7 @@ const App = () => {
 
   return (
     <div>
-      <div>find countries: <input value={newFilter} onChange = {handleFilterChange}/></div>
+      <Filter filterValue={newFilter} handleFilterChange = {handleFilterChange} />
       <Display countries={filteredCountries} weather = {weather} handleShowButtonClick={showCountry}/>
     </div>
   )
