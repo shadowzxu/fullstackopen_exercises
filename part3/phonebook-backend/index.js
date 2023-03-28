@@ -61,15 +61,15 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    if(!body.name) {
+    if(!body.name || !body.number) {
         return response.status(400).json({
-            error: 'name missing'
+            error: 'content missing'
         })
     }
 
-    if(!body.number) {
+    if(persons.find(p => p.name === body.name)) {
         return response.status(400).json({
-            error: 'number missing'
+            error: 'name must be unique'
         })
     }
 
