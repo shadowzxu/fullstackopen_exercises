@@ -8,6 +8,8 @@ app.use(express.json())
 
 app.use(cors())
 
+app.use(express.static('build'))
+
 // Define a custom token for logging the request body
 morgan.token('type', (req, res) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : ' '
@@ -38,10 +40,6 @@ let persons = [
       "number": "39-23-6423122"
     }
 ]
-
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
 
 app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info for ${persons.length} people<br>${Date()}</p>`)
