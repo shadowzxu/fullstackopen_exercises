@@ -11,14 +11,23 @@ const url =
 `mongodb+srv://root:${password}@cluster0.gzkzrxj.mongodb.net/phonebookApp?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery',false)
+
 mongoose.connect(url)
 
-const personsSchema = new mongoose.Schema({
+const personSchema = new mongoose.Schema({
   name: String,
   number: String,
 })
 
-const Person = mongoose.model('Persons', personsSchema)
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString()
+      delete returnedObject._id
+      delete returnedObject.__v
+    }
+  })
+
+const Person = mongoose.model('Person', personSchema)
 
 if(process.argv[3] && process.argv[4]){
     const person = new Person({
@@ -37,5 +46,5 @@ else{
             console.log(`${person.name} ${person.number}`);
         })
         mongoose.connection.close()
-  })
+    })
 }
