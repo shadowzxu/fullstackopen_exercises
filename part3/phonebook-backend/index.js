@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { response } = require('express')
+const { response, request } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -44,10 +44,6 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-    // const id = Number(request.params.id)
-    // persons = persons.filter(p => p.id !== id)
-
-    // response.status(204).end()
     Person.findByIdAndRemove(request.params.id)
         .then(result => {
             response.status(204).end()
@@ -72,6 +68,21 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
         response.json(savedPerson)
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number,
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
