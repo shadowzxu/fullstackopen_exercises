@@ -7,21 +7,17 @@ const app = express()
 
 const Person = require('./models/person')
 
-app.use(express.json())
-app.use(cors())
 app.use(express.static('build'))
+app.use(cors())
+app.use(express.json())
 
-// Define a custom token for logging the request body
+// RequestLogger: define a custom token for logging the request body
 morgan.token('type', (req, res) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : ' '
 })
 
-// Use the Morgan middleware with the custom token
+// RequestLogger: Use the Morgan middleware with the custom token
 app.use(morgan(':method :url :status :response-time ms - :type'))
-
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
 
 let persons = []
 
@@ -47,11 +43,16 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(p => p.id !== id)
+app.delete('/api/persons/:id', (request, response, next) => {
+    // const id = Number(request.params.id)
+    // persons = persons.filter(p => p.id !== id)
 
-    response.status(204).end()
+    // response.status(204).end()
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -73,7 +74,26 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// handler of requests with unknown endpoint
 app.use(unknownEndpoint)
+
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+}
+  
+  // handler of requests with result to errors
+  app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
