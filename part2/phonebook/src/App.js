@@ -44,6 +44,12 @@ const App = () => {
               setMessage({content: null, type: 'INFO'})
             }, 3000)
           })
+          .catch(error => {
+            setMessage({content: error.response.data.error, type: 'ERROR'})
+            setTimeout(() => {
+              setMessage({content: null, type: 'INFO'})
+            }, 3000)            
+          })
       }
       
       return;
@@ -66,6 +72,12 @@ const App = () => {
         setTimeout(() => {
           setMessage({content: null, type: 'INFO'})
         }, 3000)
+      })
+      .catch(error => {
+        setMessage({content: error.response.data.error, type: 'ERROR'})
+        setTimeout(() => {
+          setMessage({content: null, type: 'INFO'})
+        }, 3000)            
       })
   }
 
