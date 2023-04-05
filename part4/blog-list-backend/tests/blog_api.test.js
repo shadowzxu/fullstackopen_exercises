@@ -80,6 +80,24 @@ test('a valid blog can be added', async () => {
   )
 })
 
+test('new added blog has 0 likes if likes property is missing', async () => {
+  const newBlog = {
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const result = response.body[response.body.length - 1].likes
+  expect(result).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
