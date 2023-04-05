@@ -29,9 +29,21 @@ const mostBlogs = (blogs) => {
   }, { author: '', blogs: 0 })
 }
 
+const mostLikes = (blogs) => {
+  const oLikesCountByAuthor = _.mapValues(_.groupBy(blogs, 'author'), (blogs) => _.sumBy(blogs, 'likes'))
+
+  return _.transform(oLikesCountByAuthor, (result, value, key) => {
+    if(value > result.likes){
+      result.author = key
+      result.likes = value
+    }
+  }, { author: '', likes: 0 })
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
