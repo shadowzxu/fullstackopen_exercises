@@ -21,10 +21,11 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
+
+  for(let blog of initialBlogs) {
+    let blogObject = new Blog(blog)
+    await blogObject.save()
+  }
 })
 
 test('blogs are returned as json', async () => {
@@ -96,6 +97,30 @@ test('new added blog has 0 likes if likes property is missing', async () => {
   const response = await api.get('/api/blogs')
   const result = response.body[response.body.length - 1].likes
   expect(result).toBe(0)
+})
+
+test('expect return bad request if title or url property is missing', async () => {
+  let newBlog = {
+    title: 'title1',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  newBlog = {
+    author: 'author1',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
 })
 
 afterAll(async () => {
