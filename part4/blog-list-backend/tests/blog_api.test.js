@@ -140,6 +140,43 @@ describe('deletion of a blog', () => {
   })
 })
 
+describe('update of a blog', () => {
+  let blogToUpdate
+  beforeEach(async () => {
+    blogToUpdate = new Blog({
+      title: 'Test Blog',
+      author: 'Test Author',
+      url: 'http://testblog.com',
+      likes: 0
+    })
+    await blogToUpdate.save()
+  })
+
+  afterEach(async () => {
+    await Blog.deleteMany({})
+  })
+
+  test('updates a blog with valid id and data', async () => {
+    const updatedData = {
+      title: 'Updated Blog',
+      author: 'Updated Author',
+      url: 'http://updatedblog.com',
+      likes: 5
+    }
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body).toMatchObject(updatedData)
+
+    const updatedBlog = await Blog.findById(blogToUpdate.id)
+    expect(updatedBlog.toJSON()).toMatchObject(updatedData)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
