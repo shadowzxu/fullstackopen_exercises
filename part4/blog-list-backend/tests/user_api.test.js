@@ -7,6 +7,7 @@ const api = supertest(app)
 const User = require('../models/user')
 
 describe('POST /api/users: when there is initially one user in db', () => {
+
   beforeEach(async () => {
     await User.deleteMany({})
 
@@ -54,6 +55,67 @@ describe('POST /api/users: when there is initially one user in db', () => {
       .expect('Content-Type', /application\/json/)
 
     expect(result.body.error).toContain('expected `username` to be unique')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toEqual(usersAtStart)
+  })
+
+  test('creation fails with proper statuscode and message if username or password length is invalid', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUserInvalidUsername = {
+      username: 'testuser',
+      name: 'test',
+      password: 'sa',
+    }
+
+    const newUserInvalidPassword = {
+      username: 'testuser',
+      name: 'test',
+      password: 'sa',
+    }
+
+    const newUserUndefinedUsername = {
+      name: 'test',
+      password: 'sa',
+    }
+
+    const newUserUndefinedPassword = {
+      username: 'testuser',
+      name: 'test',
+    }
+
+    let result = await api
+      .post('/api/users')
+      .send(newUserInvalidUsername)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toBe('invalid username or password.')
+
+    result = await api
+      .post('/api/users')
+      .send(newUserInvalidPassword)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toBe('invalid username or password.')
+
+    result = await api
+      .post('/api/users')
+      .send(newUserUndefinedUsername)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toBe('invalid username or password.')
+
+    result = await api
+      .post('/api/users')
+      .send(newUserUndefinedPassword)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toBe('invalid username or password.')
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toEqual(usersAtStart)
