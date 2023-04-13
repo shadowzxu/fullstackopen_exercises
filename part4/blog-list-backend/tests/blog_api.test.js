@@ -4,10 +4,20 @@ const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
+let authHeader
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
+
+  await User.deleteMany({})
+  // create a test user and save the corresponding auth header
+  const user = helper.initialUsers[0]
+  await api.post('/api/users').send(user)
+  const response = await api.post('/api/login').send(user)
+  authHeader = `Bearer ${response.body.token}`
 })
 
 describe('GET /api/blogs: get all blogs', () => {
@@ -41,9 +51,10 @@ describe('GET /api/blogs: get all blogs', () => {
 })
 
 describe('POST /api/blogs: add new blogs', () => {
+
   test('a valid blog can be added', async () => {
     const newBlog = {
-      title: 'Canonical string reduction',
+      title: 'test blog',
       author: 'Edsger W. Dijkstra',
       url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
       likes: 12
@@ -51,6 +62,7 @@ describe('POST /api/blogs: add new blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -74,6 +86,7 @@ describe('POST /api/blogs: add new blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -83,25 +96,48 @@ describe('POST /api/blogs: add new blogs', () => {
     expect(result).toBe(0)
   })
 
-  test('expect return bad request if title or url property is missing', async () => {
-    let newBlog = {
-      title: 'title1',
+  test('adding a blog failed if token is not provided', async () => {
+    const blogsBefore = await helper.blogsInDb()
+
+    const newBlog = {
+      title: 'First class tests',
+      author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
     }
 
     await api
       .post('/api/blogs')
       .send(newBlog)
-      .expect(400)
+      .expect(401)
       .expect('Content-Type', /application\/json/)
 
-    newBlog = {
+    const blogsAfter = await helper.blogsInDb()
+    expect(blogsAfter).toHaveLength(blogsBefore.length)
+  })
+
+  test('expect return bad request if title is missing', async () => {
+    const newBlog = {
       author: 'author1',
-      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll'
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('expect return bad request if author is missing', async () => {
+    const newBlog = {
+      title: 'title1',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll'
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -109,22 +145,47 @@ describe('POST /api/blogs: add new blogs', () => {
 })
 
 describe('DELETE /api/blogs: deletion of a blog', () => {
-  test('succeeds woth status code 204 if id is valid', async () => {
-    const blogAtStart = await helper.blogsInDb()
-    const blogToDelete = blogAtStart[0]
+  let id
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+
+    const blog = {
+      title: 'React patterns',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/',
+      likes: 7,
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send(blog)
+
+    id = response.body.id
+  })
+
+  test('can be deleted by the creator', async () => {
+    const blogsBefore = await helper.blogsInDb()
 
     await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
+      .delete(`/api/blogs/${id}`)
+      .set('Authorization', authHeader)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
-    expect(blogsAtEnd).toHaveLength(
-      helper.initialBlogs.length -  1
-    )
+    expect(blogsBefore).toHaveLength(1)
+    expect(blogsAtEnd).toHaveLength(0)
+  })
 
-    const titles = blogsAtEnd.map(t => t.title)
-    expect(titles).not.toContain(blogToDelete.title)
+  test('can not be deleted without valid auth header', async () => {
+    await api
+      .delete(`/api/blogs/${id}`)
+      .expect(401)
+
+    const blogsAfter = await helper.blogsInDb()
+
+    expect(blogsAfter).toHaveLength(1)
   })
 })
 
