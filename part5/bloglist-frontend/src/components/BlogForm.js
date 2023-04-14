@@ -6,7 +6,7 @@ const BlogForm = ({
   title, author, url }) => {
   return (
       <div>
-        <h2>create new</h2>
+        <h2>create new blog</h2>
         <form onSubmit={handleSubmit}>
             <div>
             title: 

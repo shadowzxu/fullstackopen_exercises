@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -32,7 +33,6 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log(`login: ${username} and ${password}`);
     try {
       const user = await loginService.login({
         username, password
@@ -86,6 +86,16 @@ const App = () => {
     }
   }
 
+  const handleUsernameChange = (event) => {
+    event.preventDefault()
+    setUsername(event.target.value)
+  }
+
+  const handlePasswordChange = (event) => {
+    event.preventDefault()
+    setPassword(event.target.value)
+  }
+
   const handleTitleChange = (event) => {
     event.preventDefault()
     setTitle(event.target.value)
@@ -102,27 +112,15 @@ const App = () => {
   if( user === null) {
     return (
       <div>
-        <h2>Login</h2>
-        <Notification message = {message.content} type = {message.type} />
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-              <input
-              type='text'
-              value={username}
-              name='Username'
-              onChange={({target})=>setUsername(target.value)}/>
-          </div>
-          <div>
-            password
-              <input
-              type='password'
-              value={password}
-              name='password'
-              onChange={({target})=>setPassword(target.value)}/>
-          </div>
-          <button type='submit'>login</button>
-        </form>
+        <Notification 
+          message = {message.content} 
+          type = {message.type} />
+        <LoginForm 
+          handleSubmit={handleLogin}
+          handleUsernameChange={handleUsernameChange}
+          handlePasswordChange={handlePasswordChange}
+          username={username}
+          password={password}/>
       </div>
     )
   }
@@ -132,7 +130,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification message = {message.content} type = {message.type} />
       {user.name} logged in <button onClick={handleLogout}>logout</button>
-      <Togglable buttonLabel='new note'>
+      <Togglable buttonLabel='create new blog'>
         <BlogForm 
           handleSubmit={handleCreateNewBlog}
           handleTitleChange={handleTitleChange}
