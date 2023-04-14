@@ -28,8 +28,6 @@ const Blog = ({blog}) => {
       user: blog.user.id
     }
 
-    console.log(updateBlog)
-
     const response = await blogService.update(updateBlog, blog.id)
 
     blog.likes = response.likes
