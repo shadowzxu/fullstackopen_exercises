@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +12,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [message, setMessage] = useState({content: null, type:'INFO'})
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,7 +44,10 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch(exception) {
-      console.error('Wrong credentials');
+      setMessage({content: 'wrong username or password', type: 'ERROR'})
+      setTimeout(() => {
+        setMessage({content: null, type: 'INFO'})
+      }, 3000)
     }
   }
 
@@ -66,8 +71,16 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+
+      setMessage({content: `a new blog ${newBlog.title} by ${newBlog.author}`, type: 'INFO'})
+      setTimeout(() => {
+        setMessage({content: null, type: 'INFO'})
+      }, 3000)
     } catch(exception) {
-      console.error(`create fail: `, exception)
+      setMessage({content: `creation fail: ${exception.response.data.error}`, type: 'ERROR'})
+      setTimeout(() => {
+        setMessage({content: null, type: 'INFO'})
+      }, 3000)
     }
   }
 
@@ -75,6 +88,7 @@ const App = () => {
     return (
       <div>
         <h2>Login</h2>
+        <Notification message = {message.content} type = {message.type} />
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -101,8 +115,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message = {message.content} type = {message.type} />
       {user.name} logged in <button onClick={handleLogout}>logout</button>
-
       <h2>create new</h2>
       <div>
         <form onSubmit={handleCreateNewBlog}>
