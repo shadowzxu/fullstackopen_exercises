@@ -68,6 +68,7 @@ const App = () => {
         url: url
       }
       const newBlog = await blogService.create(blog, user.token)
+      newBlog.user = user
       
       setBlogs(blogs.concat(newBlog))
       setTitle('')
