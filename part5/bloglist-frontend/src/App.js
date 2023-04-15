@@ -87,6 +87,23 @@ const App = () => {
     }
   }
 
+  const handleRemoveBlog = async (event) => {
+    event.preventDefault()
+
+    if(window.confirm(`Remove blog ${event.target.value}`)){
+      try {
+        await blogService.remove(event.target.id, user.token)
+        const blogs = await blogService.getAll()
+        setBlogs( blogs )
+      } catch(exception) {
+        setMessage({content: `deletion fail: ${exception.response.data.error}`, type: 'ERROR'})
+        setTimeout(() => {
+          setMessage({content: null, type: 'INFO'})
+        }, 3000)
+      }
+    }
+  }
+
   const handleUsernameChange = (event) => {
     event.preventDefault()
     setUsername(event.target.value)
@@ -144,7 +161,7 @@ const App = () => {
           url={url}/>
       </Togglable>
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleRemoveBtnClick={ handleRemoveBlog }/>
       )}
     </div>
   )
