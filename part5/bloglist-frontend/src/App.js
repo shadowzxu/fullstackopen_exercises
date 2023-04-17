@@ -15,12 +15,12 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
-  const [message, setMessage] = useState({content: null, type:'INFO'})
+  const [message, setMessage] = useState({ content: null, type:'INFO' })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -41,14 +41,14 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
-      
+
       setUser(user)
       setUsername('')
       setPassword('')
     } catch(exception) {
-      setMessage({content: 'wrong username or password', type: 'ERROR'})
+      setMessage({ content: 'wrong username or password', type: 'ERROR' })
       setTimeout(() => {
-        setMessage({content: null, type: 'INFO'})
+        setMessage({ content: null, type: 'INFO' })
       }, 3000)
     }
   }
@@ -69,20 +69,20 @@ const App = () => {
       }
       const newBlog = await blogService.create(blog, user.token)
       newBlog.user = user
-      
+
       setBlogs(blogs.concat(newBlog))
       setTitle('')
       setAuthor('')
       setUrl('')
 
-      setMessage({content: `a new blog ${newBlog.title} by ${newBlog.author}`, type: 'INFO'})
+      setMessage({ content: `a new blog ${newBlog.title} by ${newBlog.author}`, type: 'INFO' })
       setTimeout(() => {
-        setMessage({content: null, type: 'INFO'})
+        setMessage({ content: null, type: 'INFO' })
       }, 3000)
     } catch(exception) {
-      setMessage({content: `creation fail: ${exception.response.data.error}`, type: 'ERROR'})
+      setMessage({ content: `creation fail: ${exception.response.data.error}`, type: 'ERROR' })
       setTimeout(() => {
-        setMessage({content: null, type: 'INFO'})
+        setMessage({ content: null, type: 'INFO' })
       }, 3000)
     }
   }
@@ -96,9 +96,9 @@ const App = () => {
         const blogs = await blogService.getAll()
         setBlogs( blogs )
       } catch(exception) {
-        setMessage({content: `deletion fail: ${exception.response.data.error}`, type: 'ERROR'})
+        setMessage({ ontent: `deletion fail: ${exception.response.data.error}`, type: 'ERROR' })
         setTimeout(() => {
-          setMessage({content: null, type: 'INFO'})
+          setMessage({ content: null, type: 'INFO' })
         }, 3000)
       }
     }
@@ -132,10 +132,10 @@ const App = () => {
   if( user === null) {
     return (
       <div>
-        <Notification 
-          message = {message.content} 
+        <Notification
+          message = {message.content}
           type = {message.type} />
-        <LoginForm 
+        <LoginForm
           handleSubmit={handleLogin}
           handleUsernameChange={handleUsernameChange}
           handlePasswordChange={handlePasswordChange}
@@ -151,12 +151,12 @@ const App = () => {
       <Notification message = {message.content} type = {message.type} />
       {user.name} logged in <button onClick={handleLogout}>logout</button>
       <Togglable buttonLabel='create new blog'>
-        <BlogForm 
+        <BlogForm
           handleSubmit={handleCreateNewBlog}
           handleTitleChange={handleTitleChange}
           handleAuthorChange={handleAuthorChange}
           handleUrlChange={handleUrlChange}
-          title={title} 
+          title={title}
           author={author}
           url={url}/>
       </Togglable>

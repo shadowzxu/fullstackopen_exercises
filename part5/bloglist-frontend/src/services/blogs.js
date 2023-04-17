@@ -22,7 +22,7 @@ const update = async (updatedBlog, id) => {
 
 const remove = async (id, token) => {
   const config = {
-    headers: { Authorization: `Bearer ${token}`}
+    headers: { Authorization: `Bearer ${token}` }
   }
   const response = await axios.delete(`${baseUrl}/${id}`, config)
   return response.data
