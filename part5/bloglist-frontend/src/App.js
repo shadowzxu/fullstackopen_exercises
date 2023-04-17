@@ -161,7 +161,7 @@ const App = () => {
           url={url}/>
       </Togglable>
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleRemoveBtnClick={ handleRemoveBlog }/>
+        <Blog key={blog.id} blog={blog} handleRemoveBtnClick={ handleRemoveBlog } blogService={ blogService }/>
       )}
     </div>
   )
