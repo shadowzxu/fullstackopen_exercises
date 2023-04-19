@@ -12,22 +12,25 @@ const BlogForm = ({
           title:
           <input
             value={title}
-            onChange={ handleTitleChange }>
-          </input>
+            onChange={ handleTitleChange }
+            id='title-input'
+          />
         </div>
         <div>
           author:
           <input
             value={author}
-            onChange={ handleAuthorChange }>
-          </input>
+            onChange={ handleAuthorChange }
+            id='author-input'
+          />
         </div>
         <div>
           url:
           <input
             value={url}
-            onChange={ handleUrlChange }>
-          </input>
+            onChange={ handleUrlChange }
+            id='url-input'
+          />
         </div>
         <button type='submit'>submit</button>
       </form>

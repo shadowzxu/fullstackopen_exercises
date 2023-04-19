@@ -58,8 +58,6 @@ describe('<Blog />', () => {
     await user.click(button)
     await user.click(button)
 
-    screen.debug()
-
     const p = container.querySelector('.likes')
     expect(p).toHaveTextContent(`Likes: ${likesAfterBtnClickedTwice}`)
   })
