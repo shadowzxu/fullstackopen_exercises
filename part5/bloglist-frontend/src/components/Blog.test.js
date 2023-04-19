@@ -7,7 +7,9 @@ import userEvent from '@testing-library/user-event'
 describe('<Blog />', () => {
   let container
   let mockBlogService = {
-    update: jest.fn()
+    update: (updatedBLog) => {
+      return updatedBLog
+    }
   }
   let mockHandleRemoveBtnClick = jest.fn()
   const blog = {
@@ -47,6 +49,19 @@ describe('<Blog />', () => {
     const div = container.querySelector('.blogDetail')
     expect(button).toHaveTextContent('hide')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('after clicking like button twice, number of likes add by 2',  async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('like')
+    const likesAfterBtnClickedTwice = blog.likes + 2
+    await user.click(button)
+    await user.click(button)
+
+    screen.debug()
+
+    const p = container.querySelector('.likes')
+    expect(p).toHaveTextContent(`Likes: ${likesAfterBtnClickedTwice}`)
   })
 })
 

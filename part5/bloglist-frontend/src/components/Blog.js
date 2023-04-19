@@ -40,7 +40,7 @@ const Blog = ({ blog, handleRemoveBtnClick, blogService }) => {
       <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       <div style={showWhenVisible} className='blogDetail'>
         <p>{blog.url}</p>
-        <p>Likes: {likes} <button onClick={addLikes}>like</button></p>
+        <p className='likes'>Likes: {likes} <button onClick={addLikes}>like</button></p>
         <p>{blog.user.name}</p>
         <button
           id = {blog.id}
