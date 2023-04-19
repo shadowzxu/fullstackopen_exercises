@@ -2,8 +2,10 @@ import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import { render, screen } from '@testing-library/react'
 import Blog from './Blog'
+import userEvent from '@testing-library/user-event'
 
 describe('<Blog />', () => {
+  let container
   let mockBlogService = {
     update: jest.fn()
   }
@@ -19,26 +21,32 @@ describe('<Blog />', () => {
     }
   }
 
-  test('render the blog\'s title and author', () => {
-    render(<Blog
+  beforeEach(() => {
+    container = render(<Blog
       blog={ blog }
       handleRemoveBtnClick={mockHandleRemoveBtnClick}
       blogService={ mockBlogService }/>
-    )
+    ).container
+  })
 
+  test('render the blog\'s title and author', () => {
     const element = screen.getByText(`${blog.title} ${blog.author}`)
     expect(element).toBeDefined()
   })
 
   test('hide blog details by default', () => {
-    const component = render(<Blog
-      blog={ blog }
-      handleRemoveBtnClick={mockHandleRemoveBtnClick}
-      blogService={ mockBlogService }/>
-    )
-
-    const div = component.container.querySelector('.blogDetail')
+    const div = container.querySelector('.blogDetail')
     expect(div).toHaveStyle('display: none')
+  })
+
+  test('show blog details after clicking the button', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+    await user.click(button)
+
+    const div = container.querySelector('.blogDetail')
+    expect(button).toHaveTextContent('hide')
+    expect(div).not.toHaveStyle('display: none')
   })
 })
 
