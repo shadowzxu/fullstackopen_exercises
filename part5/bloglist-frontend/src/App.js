@@ -49,7 +49,7 @@ const App = () => {
       setMessage({ content: 'wrong username or password', type: 'ERROR' })
       setTimeout(() => {
         setMessage({ content: null, type: 'INFO' })
-      }, 3000)
+      }, 5000)
     }
   }
 
