@@ -101,6 +101,18 @@ describe('Blog app', function() {
         cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
           .get('.likes').should('contain', 'Likes: 2')
       })
+
+      it('user who created a blog can delete it', function() {
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('remove')
+          .click()
+
+        cy.get('.blog').should('not.exist')
+      })
     })
   })
 })
