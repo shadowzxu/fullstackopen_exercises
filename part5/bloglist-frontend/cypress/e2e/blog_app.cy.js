@@ -3,9 +3,16 @@ describe('Blog app', function() {
     cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
 
     // create here a user to backend
-    const user = {
+    let user = {
       'username': 'hellas',
       'name': 'Test User',
+      'password': 'salainen'
+    }
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+
+    user = {
+      'username': 'jasonzxu',
+      'name': 'Test User 2',
       'password': 'salainen'
     }
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
@@ -57,6 +64,43 @@ describe('Blog app', function() {
         .should('contain','a new blog React patterns by Michael Chan')
         .and('have.css','color','rgb(0, 128, 0)')
       cy.contains('React patterns Michael Chan')
+    })
+
+    describe('and a blog exists', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'Go To Statement Considered Harmful',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+        })
+      })
+
+      it('users can like a blog', function () {
+        //Test User clicks like button
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('like')
+          .click()
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .get('.likes').should('contain', 'Likes: 1')
+
+        //Logout Test User and login test user 2
+        cy.get('#logout-button').click()
+        cy.login({ username: 'jasonzxu', password: 'salainen' })
+        cy.reload()
+
+        //Test User 2 clicks like button
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('like')
+          .click()
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .get('.likes').should('contain', 'Likes: 2')
+      })
     })
   })
 })
