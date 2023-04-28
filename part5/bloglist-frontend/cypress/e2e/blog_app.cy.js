@@ -38,4 +38,25 @@ describe('Blog app', function() {
         .and('have.css','color','rgb(255, 0, 0)')
     })
   })
+
+  describe('When logged in', function() {
+    beforeEach(function() {
+      cy.login({ username: 'hellas', password: 'salainen' })
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('Test User logged in')
+      cy.contains('create new blog').click()
+
+      cy.get('#title-input').type('React patterns')
+      cy.get('#author-input').type('Michael Chan')
+      cy.get('#url-input').type('https://reactpatterns.com/')
+      cy.get('#submit-button').click()
+
+      cy.get('#notification')
+        .should('contain','a new blog React patterns by Michael Chan')
+        .and('have.css','color','rgb(0, 128, 0)')
+      cy.contains('React patterns Michael Chan')
+    })
+  })
 })

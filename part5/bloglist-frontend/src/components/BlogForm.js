@@ -32,7 +32,7 @@ const BlogForm = ({
             id='url-input'
           />
         </div>
-        <button type='submit'>submit</button>
+        <button type='submit' id='submit-button'>submit</button>
       </form>
     </div>
   )
