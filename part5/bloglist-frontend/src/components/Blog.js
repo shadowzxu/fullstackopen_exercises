@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, handleRemoveBtnClick, blogService }) => {
+const Blog = ({ blog, isCreator, handleRemoveBtnClick, blogService }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
   const toggleVisibility = () => {
@@ -32,6 +32,20 @@ const Blog = ({ blog, handleRemoveBtnClick, blogService }) => {
 
     blog.likes = response.likes
     setLikes(response.likes)
+  }
+
+  if(!isCreator) {
+    return (
+      <div style={blogStyle} className='blog'>
+        {blog.title} {blog.author}
+        <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
+        <div style={showWhenVisible} className='blogDetail'>
+          <p>{blog.url}</p>
+          <p className='likes'>Likes: {likes} <button onClick={addLikes}>like</button></p>
+          <p>{blog.user.name}</p>
+        </div>
+      </div>
+    )
   }
 
   return (

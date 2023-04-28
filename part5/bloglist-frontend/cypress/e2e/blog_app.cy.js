@@ -113,6 +113,27 @@ describe('Blog app', function() {
 
         cy.get('.blog').should('not.exist')
       })
+
+      it('only the createor can see the delete button of a blog', function() {
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .should('contain', 'remove')
+
+        //Logout Test User and login test user 2
+        cy.get('#logout-button').click()
+        cy.login({ username: 'jasonzxu', password: 'salainen' })
+        cy.reload()
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .should('not.contain', 'remove')
+      })
     })
   })
 })
