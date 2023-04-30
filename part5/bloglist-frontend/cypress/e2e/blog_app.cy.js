@@ -135,5 +135,58 @@ describe('Blog app', function() {
           .should('not.contain', 'remove')
       })
     })
+
+    describe('many blogs exist', function() {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'React patterns',
+          author: 'Michael Chan',
+          url: 'https://reactpatterns.com/'
+        })
+
+        cy.createBlog({
+          title: 'Canonical string reduction',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+        })
+
+        cy.createBlog({
+          title: 'Go To Statement Considered Harmful',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+        })
+      })
+
+      it('blogs are ordered by likes with most likes being first', function () {
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('like')
+          .click()
+
+        cy.wait(500)
+
+        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
+          .contains('like')
+          .click()
+
+        cy.wait(500)
+
+        cy.contains('Canonical string reduction Edsger W. Dijkstra')
+          .contains('view')
+          .click()
+
+        cy.contains('Canonical string reduction Edsger W. Dijkstra')
+          .contains('like')
+          .click()
+
+        cy.reload()
+
+        cy.get('.blog').eq(0).should('contain', 'Go To Statement Considered Harmful Edsger W. Dijkstra')
+        cy.get('.blog').eq(1).should('contain', 'Canonical string reduction Edsger W. Dijkstra')
+      })
+    })
   })
 })
