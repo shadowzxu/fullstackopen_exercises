@@ -14,7 +14,8 @@ const App = () => {
     'anecdotes',
     getAnecdotes,
     {
-      retry: false
+      retry: false,
+      refetchOnWindowFocus: false
     }
   )
 
