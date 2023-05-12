@@ -24,6 +24,9 @@ const AnecdoteForm = () => {
       const anecdotes = queryClient.getQueryData('anecdotes')
       queryClient.setQueryData('anecdotes', anecdotes.concat(newAnecdote))
       setNotificationMessage(`anecdote ${newAnecdote.content} created`)
+    },
+    onError: (error) => {
+      setNotificationMessage(error.message)
     }
   })
 
