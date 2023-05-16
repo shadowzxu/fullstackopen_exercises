@@ -66,6 +66,10 @@ const Footer = () => (
   </div>
 )
 
+const Input = (props) => (
+  <input value={props.value} type={props.type} onChange={props.onChange}/>
+)
+
 const CreateNew = (props) => {
   const navigate = useNavigate()
   const content = useField('text')
@@ -96,15 +100,15 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content.value} onChange={content.onChange} />
+          <Input {...content} />
         </div>
         <div>
           author
-          <input name='author' value={author.value} onChange={author.onChange} />
+          <Input {...author} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info.value} onChange={info.onChange} />
+          <Input {...info} />
         </div>
         <button>create</button>
         <button onClick={handleReset}>reset</button>
