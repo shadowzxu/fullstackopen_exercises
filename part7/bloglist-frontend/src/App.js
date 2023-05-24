@@ -6,11 +6,10 @@ import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import storageService from './services/storage'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -19,44 +18,38 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs(blogs)
     )
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-    }
+    const user = storageService.loadUser()
+    setUser(user)
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const notifyWith = (message, type='INFO') => {
+    setMessage({ content: message, type: type })
+    setTimeout(() => {
+      setMessage({ content: null, type: 'INFO' })
+    }, 5000)
+  }
+
+  const onLogin = async (username, password) => {
     try {
       const user = await loginService.login({
         username, password
       })
-
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
-
       setUser(user)
-      setUsername('')
-      setPassword('')
+      storageService.saveUser(user)
     } catch(exception) {
-      setMessage({ content: 'wrong username or password', type: 'ERROR' })
-      setTimeout(() => {
-        setMessage({ content: null, type: 'INFO' })
-      }, 5000)
+      notifyWith('wrong username or password', 'ERROR')
     }
   }
 
-  const handleLogout = (event) => {
-    event.preventDefault()
-    window.localStorage.removeItem('loggedBlogappUser')
+  const logout = async () => {
     setUser(null)
+    storageService.removeUser()
+    notifyWith('logged out')
   }
 
   const handleCreateNewBlog = async (event) => {
@@ -104,16 +97,6 @@ const App = () => {
     }
   }
 
-  const handleUsernameChange = (event) => {
-    event.preventDefault()
-    setUsername(event.target.value)
-  }
-
-  const handlePasswordChange = (event) => {
-    event.preventDefault()
-    setPassword(event.target.value)
-  }
-
   const handleTitleChange = (event) => {
     event.preventDefault()
     setTitle(event.target.value)
@@ -136,11 +119,7 @@ const App = () => {
           message = {message.content}
           type = {message.type} />
         <LoginForm
-          handleSubmit={handleLogin}
-          handleUsernameChange={handleUsernameChange}
-          handlePasswordChange={handlePasswordChange}
-          username={username}
-          password={password}/>
+          onLogin={onLogin}/>
       </div>
     )
   }
@@ -149,7 +128,7 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification message = {message.content} type = {message.type} />
-      {user.name} logged in <button id='logout-button' onClick={handleLogout}>logout</button>
+      {user.name} logged in <button id='logout-button' onClick={logout}>logout</button>
       <Togglable buttonLabel='create new blog'>
         <BlogForm
           handleSubmit={handleCreateNewBlog}
