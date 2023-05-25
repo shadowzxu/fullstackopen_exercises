@@ -11,9 +11,6 @@ import storageService from './services/storage'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [message, setMessage] = useState({ content: null, type:'INFO' })
 
   useEffect(() => {
@@ -52,31 +49,15 @@ const App = () => {
     notifyWith('logged out')
   }
 
-  const handleCreateNewBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const blog = {
-        title: title,
-        author: author,
-        url: url
-      }
-      const newBlog = await blogService.create(blog, user.token)
-      newBlog.user = user
-
-      setBlogs(blogs.concat(newBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-
-      setMessage({ content: `a new blog ${newBlog.title} by ${newBlog.author}`, type: 'INFO' })
-      setTimeout(() => {
-        setMessage({ content: null, type: 'INFO' })
-      }, 3000)
-    } catch(exception) {
-      setMessage({ content: `creation fail: ${exception.response.data.error}`, type: 'ERROR' })
-      setTimeout(() => {
-        setMessage({ content: null, type: 'INFO' })
-      }, 3000)
+  const createBlog = async (newBlog) => {
+    try{
+      const createdBlog = await blogService.create(newBlog)
+      createdBlog.user = user
+      notifyWith(`a new blog ${createdBlog.title} by ${createdBlog.author}`)
+      setBlogs(blogs.concat(createdBlog))
+    }
+    catch(exception) {
+      notifyWith(`creation fail: ${exception.response.data.error}`, 'ERROR')
     }
   }
 
@@ -95,19 +76,6 @@ const App = () => {
         }, 3000)
       }
     }
-  }
-
-  const handleTitleChange = (event) => {
-    event.preventDefault()
-    setTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
   }
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
@@ -130,14 +98,7 @@ const App = () => {
       <Notification message = {message.content} type = {message.type} />
       {user.name} logged in <button id='logout-button' onClick={logout}>logout</button>
       <Togglable buttonLabel='create new blog'>
-        <BlogForm
-          handleSubmit={handleCreateNewBlog}
-          handleTitleChange={handleTitleChange}
-          handleAuthorChange={handleAuthorChange}
-          handleUrlChange={handleUrlChange}
-          title={title}
-          author={author}
-          url={url}/>
+        <BlogForm onCreate={createBlog}/>
       </Togglable>
       {sortedBlogs.map(blog =>
         <Blog
