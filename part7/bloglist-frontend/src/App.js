@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
@@ -12,6 +12,8 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState({ content: null, type:'INFO' })
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -55,6 +57,7 @@ const App = () => {
       createdBlog.user = user
       notifyWith(`a new blog ${createdBlog.title} by ${createdBlog.author}`)
       setBlogs(blogs.concat(createdBlog))
+      blogFormRef.current.toggleVisibility()
     }
     catch(exception) {
       notifyWith(`creation fail: ${exception.response.data.error}`, 'ERROR')
@@ -97,7 +100,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification message = {message.content} type = {message.type} />
       {user.name} logged in <button id='logout-button' onClick={logout}>logout</button>
-      <Togglable buttonLabel='create new blog'>
+      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <BlogForm onCreate={createBlog}/>
       </Togglable>
       {sortedBlogs.map(blog =>
