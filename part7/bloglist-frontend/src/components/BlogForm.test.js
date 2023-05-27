@@ -5,18 +5,30 @@ import userEvent from '@testing-library/user-event'
 import BlogForm from './BlogForm'
 
 describe('<BlogForm />', () => {
-  test('updates parent state and calls onSubmit', async () => {
-    const handleSubmit = jest.fn(event => event.preventDefault())
+  test('when blog is created, callback has correct data', async () => {
+    const onCreate = jest.fn()
+    const container = render(<BlogForm onCreate={onCreate}/>).container
 
-    const container = render(<BlogForm handleSubmit={ handleSubmit }/>).container
+    const blogToCreate = {
+      author: 'Kalle Ilves',
+      title: 'Testing is pretty easy',
+      url: 'https://testing-library.com/docs/react-testing-library/intro/',
+      likes: 0
+    }
 
-    const titleIuput = container.querySelector('#title-input')
+    const createButton = screen.getByText('submit')
 
-    const sendButton = screen.getByText('submit')
+    const titleInput = container.querySelector('#title-input')
+    await userEvent.type(titleInput, blogToCreate.title)
 
-    await userEvent.type(titleIuput, 'test title')
-    await userEvent.click(sendButton)
+    const authorInput = container.querySelector('#author-input')
+    await userEvent.type(authorInput, blogToCreate.author)
 
-    expect(handleSubmit.mock.calls).toHaveLength(1)
+    const urlInput = container.querySelector('#url-input')
+    await userEvent.type(urlInput, blogToCreate.url)
+
+    await userEvent.click(createButton)
+
+    expect(onCreate.mock.calls[0][0]).toEqual(blogToCreate)
   })
 })
