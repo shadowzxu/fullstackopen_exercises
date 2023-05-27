@@ -11,7 +11,6 @@ describe('<Blog />', () => {
       return updatedBLog
     }
   }
-  let mockHandleRemoveBtnClick = jest.fn()
   const blog = {
     id: '5a422b891b54a676234d17fa',
     title: 'First class tests',
@@ -22,12 +21,14 @@ describe('<Blog />', () => {
       name: 'User'
     }
   }
+  let remove = jest.fn()
 
   beforeEach(() => {
     container = render(<Blog
       blog={ blog }
-      handleRemoveBtnClick={mockHandleRemoveBtnClick}
-      blogService={ mockBlogService }/>
+      remove={remove}
+      blogService={ mockBlogService }
+      isCreator={true}/>
     ).container
   })
 
@@ -60,6 +61,21 @@ describe('<Blog />', () => {
 
     const p = container.querySelector('.likes')
     expect(p).toHaveTextContent(`Likes: ${likesAfterBtnClickedTwice}`)
+  })
+
+  test('after clicking remove button, callback has correct data', async () => {
+    const windowConfirmSpy = jest.spyOn(window, 'confirm')
+    windowConfirmSpy.mockImplementation(() => true)
+
+    const user =userEvent.setup()
+    const button = screen.getByText('remove')
+    await user.click(button)
+
+    expect(windowConfirmSpy).toHaveBeenCalledWith(
+      `Remove blog ${blog.title} by ${blog.author}`
+    )
+    expect(remove).toHaveBeenCalledTimes(1)
+    expect(remove).toHaveBeenCalledWith(blog)
   })
 })
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, isCreator, handleRemoveBtnClick, blogService }) => {
+const Blog = ({ blog, isCreator, remove, blogService }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
   const toggleVisibility = () => {
@@ -34,6 +34,14 @@ const Blog = ({ blog, isCreator, handleRemoveBtnClick, blogService }) => {
     setLikes(response.likes)
   }
 
+  const handleRemoveBlogBtnOnClick = (event) => {
+    event.preventDefault()
+    const confirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+    if(confirm){
+      remove(blog)
+    }
+  }
+
   if(!isCreator) {
     return (
       <div style={blogStyle} className='blog'>
@@ -56,17 +64,14 @@ const Blog = ({ blog, isCreator, handleRemoveBtnClick, blogService }) => {
         <p>{blog.url}</p>
         <p className='likes'>Likes: {likes} <button onClick={addLikes}>like</button></p>
         <p>{blog.user.name}</p>
-        <button
-          id = {blog.id}
-          onClick={ handleRemoveBtnClick }
-          value={ `${blog.title} by ${blog.author}` }>remove</button>
+        <button onClick={handleRemoveBlogBtnOnClick}>remove</button>
       </div>
     </div>
   )}
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  handleRemoveBtnClick: PropTypes.func.isRequired,
+  remove: PropTypes.func.isRequired,
 }
 
 export default Blog

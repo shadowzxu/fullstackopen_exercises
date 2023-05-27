@@ -64,20 +64,14 @@ const App = () => {
     }
   }
 
-  const handleRemoveBlog = async (event) => {
-    event.preventDefault()
-
-    if(window.confirm(`Remove blog ${event.target.value}`)){
-      try {
-        await blogService.remove(event.target.id, user.token)
-        const blogs = await blogService.getAll()
-        setBlogs( blogs )
-      } catch(exception) {
-        setMessage({ ontent: `deletion fail: ${exception.response.data.error}`, type: 'ERROR' })
-        setTimeout(() => {
-          setMessage({ content: null, type: 'INFO' })
-        }, 3000)
-      }
+  const removeBlog = async (blog) => {
+    try {
+      await blogService.remove(blog.id)
+      const blogs = await blogService.getAll()
+      setBlogs( blogs )
+      notifyWith(`The blog' ${blog.title}' by '${blog.author} removed`)
+    } catch(exception) {
+      notifyWith(`deletion fail: ${exception.response.data.error}`, 'ERROR')
     }
   }
 
@@ -107,7 +101,7 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          handleRemoveBtnClick={ handleRemoveBlog }
+          remove={removeBlog}
           blogService={ blogService }
           isCreator={ blog.user.username === user.username }/>
       )}
