@@ -6,11 +6,6 @@ import userEvent from '@testing-library/user-event'
 
 describe('<Blog />', () => {
   let container
-  let mockBlogService = {
-    update: (updatedBLog) => {
-      return updatedBLog
-    }
-  }
   const blog = {
     id: '5a422b891b54a676234d17fa',
     title: 'First class tests',
@@ -22,13 +17,14 @@ describe('<Blog />', () => {
     }
   }
   let remove = jest.fn()
+  let likeHandler = jest.fn()
 
   beforeEach(() => {
     container = render(<Blog
       blog={ blog }
       remove={remove}
-      blogService={ mockBlogService }
-      isCreator={true}/>
+      isCreator={true}
+      like={likeHandler}/>
     ).container
   })
 
@@ -55,12 +51,10 @@ describe('<Blog />', () => {
   test('after clicking like button twice, number of likes add by 2',  async () => {
     const user = userEvent.setup()
     const button = screen.getByText('like')
-    const likesAfterBtnClickedTwice = blog.likes + 2
     await user.click(button)
     await user.click(button)
 
-    const p = container.querySelector('.likes')
-    expect(p).toHaveTextContent(`Likes: ${likesAfterBtnClickedTwice}`)
+    expect(likeHandler.mock.calls).toHaveLength(2)
   })
 
   test('after clicking remove button, callback has correct data', async () => {

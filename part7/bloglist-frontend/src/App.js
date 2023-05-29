@@ -16,8 +16,9 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
       setBlogs(blogs)
+    }
     )
   }, [])
 
@@ -64,6 +65,13 @@ const App = () => {
     }
   }
 
+  const likeBlog = async (blog) => {
+    const blogToUpdate = { ...blog, likes: Number(blog.likes) + 1, user: blog.user.id }
+    const updatedBlog = await blogService.update(blogToUpdate, blog.id)
+    notifyWith(`A like for the blog ${updatedBlog.title}`)
+    setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
+  }
+
   const removeBlog = async (blog) => {
     try {
       await blogService.remove(blog.id)
@@ -102,7 +110,7 @@ const App = () => {
           key={blog.id}
           blog={blog}
           remove={removeBlog}
-          blogService={ blogService }
+          like={() => likeBlog(blog)}
           isCreator={ blog.user.username === user.username }/>
       )}
     </div>

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, isCreator, remove, blogService }) => {
+const Blog = ({ blog, isCreator, remove, like }) => {
   const [visible, setVisible] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
+
   const toggleVisibility = () => {
     setVisible(!visible)
   }
@@ -17,23 +17,6 @@ const Blog = ({ blog, isCreator, remove, blogService }) => {
     marginBottom: 5
   }
 
-  const addLikes = async (event) => {
-    event.preventDefault()
-
-    const updateBlog = {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: Number(blog.likes) + 1,
-      user: blog.user.id
-    }
-
-    const response = await blogService.update(updateBlog, blog.id)
-
-    blog.likes = response.likes
-    setLikes(response.likes)
-  }
-
   const handleRemoveBlogBtnOnClick = (event) => {
     event.preventDefault()
     const confirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
@@ -42,29 +25,15 @@ const Blog = ({ blog, isCreator, remove, blogService }) => {
     }
   }
 
-  if(!isCreator) {
-    return (
-      <div style={blogStyle} className='blog'>
-        {blog.title} {blog.author}
-        <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
-        <div style={showWhenVisible} className='blogDetail'>
-          <p>{blog.url}</p>
-          <p className='likes'>Likes: {likes} <button onClick={addLikes}>like</button></p>
-          <p>{blog.user.name}</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div style={blogStyle} className='blog'>
       {blog.title} {blog.author}
       <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       <div style={showWhenVisible} className='blogDetail'>
         <p>{blog.url}</p>
-        <p className='likes'>Likes: {likes} <button onClick={addLikes}>like</button></p>
+        <p className='likes'>Likes: {blog.likes} <button onClick={like}>like</button></p>
         <p>{blog.user.name}</p>
-        <button onClick={handleRemoveBlogBtnOnClick}>remove</button>
+        {isCreator && <button onClick={handleRemoveBlogBtnOnClick}>remove</button>}
       </div>
     </div>
   )}
@@ -72,6 +41,8 @@ const Blog = ({ blog, isCreator, remove, blogService }) => {
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   remove: PropTypes.func.isRequired,
+  like: PropTypes.func.isRequired,
+  isCreator: PropTypes.bool.isRequired
 }
 
 export default Blog
