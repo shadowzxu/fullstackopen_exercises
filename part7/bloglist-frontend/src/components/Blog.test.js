@@ -13,18 +13,15 @@ describe('<Blog />', () => {
     url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
     likes: 11,
     user: {
-      name: 'User'
-    }
+      name: 'User',
+    },
   }
   let remove = jest.fn()
   let likeHandler = jest.fn()
 
   beforeEach(() => {
-    container = render(<Blog
-      blog={ blog }
-      remove={remove}
-      isCreator={true}
-      like={likeHandler}/>
+    container = render(
+      <Blog blog={blog} remove={remove} isCreator={true} like={likeHandler} />
     ).container
   })
 
@@ -48,7 +45,7 @@ describe('<Blog />', () => {
     expect(div).not.toHaveStyle('display: none')
   })
 
-  test('after clicking like button twice, number of likes add by 2',  async () => {
+  test('after clicking like button twice, number of likes add by 2', async () => {
     const user = userEvent.setup()
     const button = screen.getByText('like')
     await user.click(button)
@@ -61,7 +58,7 @@ describe('<Blog />', () => {
     const windowConfirmSpy = jest.spyOn(window, 'confirm')
     windowConfirmSpy.mockImplementation(() => true)
 
-    const user =userEvent.setup()
+    const user = userEvent.setup()
     const button = screen.getByText('remove')
     await user.click(button)
 
@@ -72,4 +69,3 @@ describe('<Blog />', () => {
     expect(remove).toHaveBeenCalledWith(blog)
   })
 })
-

@@ -14,35 +14,42 @@ const Blog = ({ blog, isCreator, remove, like }) => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   const handleRemoveBlogBtnOnClick = (event) => {
     event.preventDefault()
-    const confirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
-    if(confirm){
+    const confirm = window.confirm(
+      `Remove blog ${blog.title} by ${blog.author}`
+    )
+    if (confirm) {
       remove(blog)
     }
   }
 
   return (
-    <div style={blogStyle} className='blog'>
+    <div style={blogStyle} className="blog">
       {blog.title} {blog.author}
       <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
-      <div style={showWhenVisible} className='blogDetail'>
+      <div style={showWhenVisible} className="blogDetail">
         <p>{blog.url}</p>
-        <p className='likes'>Likes: {blog.likes} <button onClick={like}>like</button></p>
+        <p className="likes">
+          Likes: {blog.likes} <button onClick={like}>like</button>
+        </p>
         <p>{blog.user.name}</p>
-        {isCreator && <button onClick={handleRemoveBlogBtnOnClick}>remove</button>}
+        {isCreator && (
+          <button onClick={handleRemoveBlogBtnOnClick}>remove</button>
+        )}
       </div>
     </div>
-  )}
+  )
+}
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   remove: PropTypes.func.isRequired,
   like: PropTypes.func.isRequired,
-  isCreator: PropTypes.bool.isRequired
+  isCreator: PropTypes.bool.isRequired,
 }
 
 export default Blog

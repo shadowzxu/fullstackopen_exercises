@@ -13,15 +13,15 @@ const Notification = ({ message, type }) => {
     marginBottom: '10px',
   }
 
-  if(type === 'ERROR'){
+  if (type === 'ERROR') {
     NotificationStyle = {
       ...NotificationStyle,
-      color: 'red'
+      color: 'red',
     }
   }
 
   return (
-    <div id='notification' style={NotificationStyle}>
+    <div id="notification" style={NotificationStyle}>
       {message}
     </div>
   )

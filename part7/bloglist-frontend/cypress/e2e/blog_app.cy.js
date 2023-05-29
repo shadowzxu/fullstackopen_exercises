@@ -1,33 +1,33 @@
-describe('Blog app', function() {
-  beforeEach(function() {
+describe('Blog app', function () {
+  beforeEach(function () {
     cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
 
     // create here a user to backend
     let user = {
-      'username': 'hellas',
-      'name': 'Test User',
-      'password': 'salainen'
+      username: 'hellas',
+      name: 'Test User',
+      password: 'salainen',
     }
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
 
     user = {
-      'username': 'jasonzxu',
-      'name': 'Test User 2',
-      'password': 'salainen'
+      username: 'jasonzxu',
+      name: 'Test User 2',
+      password: 'salainen',
     }
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
 
     cy.visit('')
   })
 
-  it('Login form is shown', function() {
+  it('Login form is shown', function () {
     cy.contains('Login')
     cy.contains('username')
     cy.contains('password')
   })
 
-  describe('Login',function() {
-    it('succeeds with correct credentials', function() {
+  describe('Login', function () {
+    it('succeeds with correct credentials', function () {
       cy.get('#username').type('hellas')
       cy.get('#password').type('salainen')
       cy.get('#login-button').click()
@@ -35,23 +35,23 @@ describe('Blog app', function() {
       cy.contains('Test User logged in')
     })
 
-    it('fails with wrong credentials', function() {
+    it('fails with wrong credentials', function () {
       cy.get('#username').type('hellas')
       cy.get('#password').type('wrong')
       cy.get('#login-button').click()
 
       cy.get('#notification')
-        .should('contain','wrong username or password')
-        .and('have.css','color','rgb(255, 0, 0)')
+        .should('contain', 'wrong username or password')
+        .and('have.css', 'color', 'rgb(255, 0, 0)')
     })
   })
 
-  describe('When logged in', function() {
-    beforeEach(function() {
+  describe('When logged in', function () {
+    beforeEach(function () {
       cy.login({ username: 'hellas', password: 'salainen' })
     })
 
-    it('A blog can be created', function() {
+    it('A blog can be created', function () {
       cy.contains('Test User logged in')
       cy.contains('create new blog').click()
 
@@ -61,8 +61,8 @@ describe('Blog app', function() {
       cy.get('#submit-button').click()
 
       cy.get('#notification')
-        .should('contain','a new blog React patterns by Michael Chan')
-        .and('have.css','color','rgb(0, 128, 0)')
+        .should('contain', 'a new blog React patterns by Michael Chan')
+        .and('have.css', 'color', 'rgb(0, 128, 0)')
       cy.contains('React patterns Michael Chan')
     })
 
@@ -71,7 +71,7 @@ describe('Blog app', function() {
         cy.createBlog({
           title: 'Go To Statement Considered Harmful',
           author: 'Edsger W. Dijkstra',
-          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
         })
       })
 
@@ -84,7 +84,8 @@ describe('Blog app', function() {
           .contains('like')
           .click()
         cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
-          .get('.likes').should('contain', 'Likes: 1')
+          .get('.likes')
+          .should('contain', 'Likes: 1')
 
         //Logout Test User and login test user 2
         cy.get('#logout-button').click()
@@ -99,10 +100,11 @@ describe('Blog app', function() {
           .contains('like')
           .click()
         cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
-          .get('.likes').should('contain', 'Likes: 2')
+          .get('.likes')
+          .should('contain', 'Likes: 2')
       })
 
-      it('user who created a blog can delete it', function() {
+      it('user who created a blog can delete it', function () {
         cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
           .contains('view')
           .click()
@@ -114,13 +116,14 @@ describe('Blog app', function() {
         cy.get('.blog').should('not.exist')
       })
 
-      it('only the createor can see the delete button of a blog', function() {
+      it('only the createor can see the delete button of a blog', function () {
         cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
           .contains('view')
           .click()
 
-        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
-          .should('contain', 'remove')
+        cy.contains(
+          'Go To Statement Considered Harmful Edsger W. Dijkstra'
+        ).should('contain', 'remove')
 
         //Logout Test User and login test user 2
         cy.get('#logout-button').click()
@@ -131,29 +134,30 @@ describe('Blog app', function() {
           .contains('view')
           .click()
 
-        cy.contains('Go To Statement Considered Harmful Edsger W. Dijkstra')
-          .should('not.contain', 'remove')
+        cy.contains(
+          'Go To Statement Considered Harmful Edsger W. Dijkstra'
+        ).should('not.contain', 'remove')
       })
     })
 
-    describe('many blogs exist', function() {
+    describe('many blogs exist', function () {
       beforeEach(function () {
         cy.createBlog({
           title: 'React patterns',
           author: 'Michael Chan',
-          url: 'https://reactpatterns.com/'
+          url: 'https://reactpatterns.com/',
         })
 
         cy.createBlog({
           title: 'Canonical string reduction',
           author: 'Edsger W. Dijkstra',
-          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
         })
 
         cy.createBlog({
           title: 'Go To Statement Considered Harmful',
           author: 'Edsger W. Dijkstra',
-          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
         })
       })
 
@@ -184,8 +188,15 @@ describe('Blog app', function() {
 
         cy.reload()
 
-        cy.get('.blog').eq(0).should('contain', 'Go To Statement Considered Harmful Edsger W. Dijkstra')
-        cy.get('.blog').eq(1).should('contain', 'Canonical string reduction Edsger W. Dijkstra')
+        cy.get('.blog')
+          .eq(0)
+          .should(
+            'contain',
+            'Go To Statement Considered Harmful Edsger W. Dijkstra'
+          )
+        cy.get('.blog')
+          .eq(1)
+          .should('contain', 'Canonical string reduction Edsger W. Dijkstra')
       })
     })
   })

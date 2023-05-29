@@ -3,12 +3,14 @@ import storageService from '../services/storage'
 const baseUrl = '/api/blogs'
 
 const headers = {
-  'Authorization': storageService.loadUser() ? `Bearer ${storageService.loadUser().token}` : null
+  Authorization: storageService.loadUser()
+    ? `Bearer ${storageService.loadUser().token}`
+    : null,
 }
 
 const getAll = () => {
   const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+  return request.then((response) => response.data)
 }
 
 const create = async (newObject) => {

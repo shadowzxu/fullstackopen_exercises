@@ -7,13 +7,13 @@ import BlogForm from './BlogForm'
 describe('<BlogForm />', () => {
   test('when blog is created, callback has correct data', async () => {
     const onCreate = jest.fn()
-    const container = render(<BlogForm onCreate={onCreate}/>).container
+    const container = render(<BlogForm onCreate={onCreate} />).container
 
     const blogToCreate = {
       author: 'Kalle Ilves',
       title: 'Testing is pretty easy',
       url: 'https://testing-library.com/docs/react-testing-library/intro/',
-      likes: 0
+      likes: 0,
     }
 
     const createButton = screen.getByText('submit')
