@@ -7,11 +7,14 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
+import { useDispatch } from 'react-redux'
+import { setNotification } from './reducers/notificationReducer'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [message, setMessage] = useState({ content: null, type: 'INFO' })
+
+  const dispatch = useDispatch()
 
   const blogFormRef = useRef()
 
@@ -26,11 +29,8 @@ const App = () => {
     setUser(user)
   }, [])
 
-  const notifyWith = (message, type = 'INFO') => {
-    setMessage({ content: message, type: type })
-    setTimeout(() => {
-      setMessage({ content: null, type: 'INFO' })
-    }, 5000)
+  const notifyWith = (info, type = 'INFO') => {
+    dispatch(setNotification({ info, type }))
   }
 
   const onLogin = async (username, password) => {
@@ -91,7 +91,7 @@ const App = () => {
   if (user === null) {
     return (
       <div>
-        <Notification message={message.content} type={message.type} />
+        <Notification />
         <LoginForm onLogin={onLogin} />
       </div>
     )
@@ -100,7 +100,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification message={message.content} type={message.type} />
+      <Notification />
       {user.name} logged in{' '}
       <button id="logout-button" onClick={logout}>
         logout
