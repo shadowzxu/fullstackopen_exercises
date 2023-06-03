@@ -3,7 +3,6 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
-import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
 import { useDispatch } from 'react-redux'
@@ -57,30 +56,6 @@ const App = () => {
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
       notifyWith(`creation fail: ${exception.response.data.error}`, 'ERROR')
-    }
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  const likeBlog = async (blog) => {
-    const blogToUpdate = {
-      ...blog,
-      likes: Number(blog.likes) + 1,
-      user: blog.user.id,
-    }
-    const updatedBlog = await blogService.update(blogToUpdate, blog.id)
-    notifyWith(`A like for the blog ${updatedBlog.title}`)
-    // setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  const removeBlog = async (blog) => {
-    try {
-      await blogService.remove(blog.id)
-      // const blogs = await blogService.getAll()
-      // setBlogs(blogs)
-      notifyWith(`The blog' ${blog.title}' by '${blog.author} removed`)
-    } catch (exception) {
-      notifyWith(`deletion fail: ${exception.response.data.error}`, 'ERROR')
     }
   }
 
