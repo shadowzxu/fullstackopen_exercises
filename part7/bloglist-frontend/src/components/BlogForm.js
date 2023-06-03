@@ -5,7 +5,7 @@ const BlogForm = ({ onCreate }) => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     onCreate({ title, author, url, likes: 0 })
     setTitle('')

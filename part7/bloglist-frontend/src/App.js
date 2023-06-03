@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
@@ -9,9 +8,10 @@ import loginService from './services/login'
 import storageService from './services/storage'
 import { useDispatch } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
+import { createBlog, initializeBlogs } from './reducers/blogReducer'
+import BlogList from './components/BlogList'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
@@ -19,10 +19,8 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      setBlogs(blogs)
-    })
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     const user = storageService.loadUser()
@@ -52,18 +50,17 @@ const App = () => {
     notifyWith('logged out')
   }
 
-  const createBlog = async (newBlog) => {
+  const onCreateBlog = async (newBlog) => {
     try {
-      const createdBlog = await blogService.create(newBlog)
-      createdBlog.user = user
-      notifyWith(`a new blog ${createdBlog.title} by ${createdBlog.author}`)
-      setBlogs(blogs.concat(createdBlog))
+      await dispatch(createBlog(newBlog, user))
+      notifyWith(`a new blog ${newBlog.title} by ${newBlog.author}`)
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
       notifyWith(`creation fail: ${exception.response.data.error}`, 'ERROR')
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const likeBlog = async (blog) => {
     const blogToUpdate = {
       ...blog,
@@ -72,21 +69,20 @@ const App = () => {
     }
     const updatedBlog = await blogService.update(blogToUpdate, blog.id)
     notifyWith(`A like for the blog ${updatedBlog.title}`)
-    setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
+    // setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
   }
 
+  // eslint-disable-next-line no-unused-vars
   const removeBlog = async (blog) => {
     try {
       await blogService.remove(blog.id)
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      // const blogs = await blogService.getAll()
+      // setBlogs(blogs)
       notifyWith(`The blog' ${blog.title}' by '${blog.author} removed`)
     } catch (exception) {
       notifyWith(`deletion fail: ${exception.response.data.error}`, 'ERROR')
     }
   }
-
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
 
   if (user === null) {
     return (
@@ -106,17 +102,9 @@ const App = () => {
         logout
       </button>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm onCreate={createBlog} />
+        <BlogForm onCreate={onCreateBlog}/>
       </Togglable>
-      {sortedBlogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          remove={removeBlog}
-          like={() => likeBlog(blog)}
-          isCreator={blog.user.username === user.username}
-        />
-      ))}
+      <BlogList user = {user}/>
     </div>
   )
 }
