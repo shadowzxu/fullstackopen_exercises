@@ -1,49 +1,27 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
-import loginService from './services/login'
 import storageService from './services/storage'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs } from './reducers/blogReducer'
 import BlogList from './components/BlogList'
+import { logout, setUser } from './reducers/userReducer'
 
 const App = () => {
-  const [user, setUser] = useState(null)
-
+  const user = useSelector(({ user }) => user)
   const dispatch = useDispatch()
-
   const blogFormRef = useRef()
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
-
   useEffect(() => {
     const user = storageService.loadUser()
-    setUser(user)
+    dispatch(setUser(user))
   }, [])
-
-  const onLogin = async (username, password) => {
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-      setUser(user)
-      storageService.saveUser(user)
-    } catch (exception) {
-      dispatch(setNotification('wrong username or password', 'ERROR'))
-    }
-  }
-
-  const logout = async () => {
-    setUser(null)
-    storageService.removeUser()
-    dispatch(setNotification('logged out'))
-  }
 
   const onCreateBlog = async (newBlog) => {
     try {
@@ -55,11 +33,11 @@ const App = () => {
     }
   }
 
-  if (user === null) {
+  if (!user) {
     return (
       <div>
         <Notification />
-        <LoginForm onLogin={onLogin} />
+        <LoginForm />
       </div>
     )
   }
@@ -69,7 +47,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification />
       {user.name} logged in{' '}
-      <button id="logout-button" onClick={logout}>
+      <button id="logout-button" onClick={() => dispatch(logout())}>
         logout
       </button>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
