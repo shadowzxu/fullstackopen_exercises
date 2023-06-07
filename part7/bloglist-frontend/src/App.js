@@ -26,10 +26,6 @@ const App = () => {
     setUser(user)
   }, [])
 
-  const notifyWith = (info, type = 'INFO') => {
-    dispatch(setNotification({ info, type }))
-  }
-
   const onLogin = async (username, password) => {
     try {
       const user = await loginService.login({
@@ -39,23 +35,23 @@ const App = () => {
       setUser(user)
       storageService.saveUser(user)
     } catch (exception) {
-      notifyWith('wrong username or password', 'ERROR')
+      dispatch(setNotification('wrong username or password', 'ERROR'))
     }
   }
 
   const logout = async () => {
     setUser(null)
     storageService.removeUser()
-    notifyWith('logged out')
+    dispatch(setNotification('logged out'))
   }
 
   const onCreateBlog = async (newBlog) => {
     try {
       await dispatch(createBlog(newBlog, user))
-      notifyWith(`a new blog ${newBlog.title} by ${newBlog.author}`)
+      dispatch(setNotification(`a new blog ${newBlog.title} by ${newBlog.author}`, 'INFO'))
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
-      notifyWith(`creation fail: ${exception.response.data.error}`, 'ERROR')
+      dispatch(setNotification(`creation fail: ${exception.response.data.error}`, 'ERROR'))
     }
   }
 

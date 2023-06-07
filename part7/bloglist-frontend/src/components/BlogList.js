@@ -10,21 +10,17 @@ const BlogLists = ({ user }) => {
 
   const dispatch = useDispatch()
 
-  const notifyWith = (info, type = 'INFO') => {
-    dispatch(setNotification({ info, type }))
-  }
-
   const likeBlogHandler = async (blog) => {
-    dispatch(likeBlog(blog))
-    notifyWith(`A like for the blog ${blog.title}`)
+    await dispatch(likeBlog(blog))
+    dispatch(setNotification(`A like for the blog ${blog.title}`, 'INFO'))
   }
 
   const removeBlogHandler = async (blog) => {
     try {
-      dispatch(removeBlog(blog))
-      notifyWith(`The blog ${blog.title} by ${blog.author} removed`)
+      await dispatch(removeBlog(blog))
+      dispatch(setNotification(`The blog ${blog.title} by ${blog.author} removed`, 'INFO'))
     } catch (exception) {
-      notifyWith(`deletion fail: ${exception.response.data.error}`, 'ERROR')
+      dispatch(setNotification(`Deletion fail: ${exception.response.data.error}`, 'ERROR'))
     }
   }
 
