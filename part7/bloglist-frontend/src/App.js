@@ -9,6 +9,9 @@ import { setNotification } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs } from './reducers/blogReducer'
 import BlogList from './components/BlogList'
 import { logout, setUser } from './reducers/userReducer'
+import UsersTable from './components/UsersTable'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { initializeUsers } from './reducers/usersReducer'
 
 const App = () => {
   const user = useSelector(({ user }) => user)
@@ -17,6 +20,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeBlogs())
+    dispatch(initializeUsers())
   }, [dispatch])
   useEffect(() => {
     const user = storageService.loadUser()
@@ -50,10 +54,20 @@ const App = () => {
       <button id="logout-button" onClick={() => dispatch(logout())}>
         logout
       </button>
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm onCreate={onCreateBlog}/>
-      </Togglable>
-      <BlogList user = {user}/>
+
+      <Router>
+        <Routes>
+          <Route path="/users" element={<UsersTable />}/>
+          <Route path="/" element={
+            <div>
+              <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+                <BlogForm onCreate={onCreateBlog}/>
+              </Togglable>
+              <BlogList user = {user}/>
+            </div>
+          }/>
+        </Routes>
+      </Router>
     </div>
   )
 }
