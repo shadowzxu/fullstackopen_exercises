@@ -13,10 +13,12 @@ import UsersTable from './components/UsersTable'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { initializeUsers } from './reducers/usersReducer'
 import User from './components/User'
+import BlogView from './components/BlogView'
 
 const App = () => {
   const user = useSelector(({ user }) => user)
   const users = useSelector(({ users }) => users)
+  const blogs = useSelector(({ blogs }) => blogs)
   const dispatch = useDispatch()
   const blogFormRef = useRef()
 
@@ -59,6 +61,7 @@ const App = () => {
 
       <Router>
         <Routes>
+          <Route path="/blogs/:id" element={<BlogView blogs = {blogs}/>}/>
           <Route path="/users/:id" element={<User users={users} />}/>
           <Route path="/users" element={<UsersTable />}/>
           <Route path="/" element={
