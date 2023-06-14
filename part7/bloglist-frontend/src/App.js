@@ -8,12 +8,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs } from './reducers/blogReducer'
 import BlogList from './components/BlogList'
-import { logout, setUser } from './reducers/userReducer'
+import { setUser } from './reducers/userReducer'
 import UsersTable from './components/UsersTable'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { initializeUsers } from './reducers/usersReducer'
 import User from './components/User'
 import BlogView from './components/BlogView'
+import Navigation from './components/Navigation'
 
 const App = () => {
   const user = useSelector(({ user }) => user)
@@ -26,6 +27,7 @@ const App = () => {
     dispatch(initializeBlogs())
     dispatch(initializeUsers())
   }, [dispatch])
+
   useEffect(() => {
     const user = storageService.loadUser()
     dispatch(setUser(user))
@@ -52,14 +54,10 @@ const App = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <Notification />
-      {user.name} logged in{' '}
-      <button id="logout-button" onClick={() => dispatch(logout())}>
-        logout
-      </button>
-
       <Router>
+        <Navigation />
+        <h2>blogs</h2>
+        <Notification />
         <Routes>
           <Route path="/blogs/:id" element={<BlogView blogs = {blogs}/>}/>
           <Route path="/users/:id" element={<User users={users} />}/>
