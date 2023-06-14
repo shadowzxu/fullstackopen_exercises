@@ -48,6 +48,13 @@ const BlogView = ({ blogs }) => {
       {isCreator && (
         <button onClick={handleRemoveBlogBtnOnClick}>remove</button>
       )}
+      <h3>comments</h3>
+      {blog.comments.length === 0 && <p>no comments</p>}
+      <ul>
+        {blog.comments.map((comment) => (
+          <li key={comment.id}>{comment.body}</li>
+        ))}
+      </ul>
     </div>
   )
 }

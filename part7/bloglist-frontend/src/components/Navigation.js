@@ -7,7 +7,7 @@ const Navigation = () => {
   const dispatch = useDispatch()
 
   const navigationBarStyle = {
-    'background-color': 'lightgrey',
+    backgroundColor: 'lightgrey',
     padding: 5,
     marginBottom: 5
   }
