@@ -18,6 +18,11 @@ const create = async (newObject) => {
   return response.data
 }
 
+const addComment = async (comment, id) => {
+  const response = await axios.post(`${baseUrl}/${id}/comment`, { body: comment })
+  return response.data
+}
+
 const update = async (updatedBlog, id) => {
   const response = await axios.put(`${baseUrl}/${id}`, updatedBlog)
   return response.data
@@ -29,4 +34,4 @@ const remove = async (id) => {
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, create, update, remove }
+export default { getAll, create, addComment, update, remove }
