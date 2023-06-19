@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux'
-import Blog from '../components/Blog'
+import { Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material'
+import Paper from '@mui/material/Paper'
+import { Link } from 'react-router-dom'
 
 const BlogLists = () => {
   const blogs = useSelector(({ blogs }) => {
@@ -7,14 +9,22 @@ const BlogLists = () => {
   })
 
   return (
-    <div>
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-        />
-      ))}
-    </div>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableBody>
+          {blogs.map(blog => (
+            <TableRow key={blog.id}>
+              <TableCell>
+                <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+              </TableCell>
+              <TableCell>
+                {blog.author}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
 
