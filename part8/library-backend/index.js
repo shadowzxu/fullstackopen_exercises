@@ -1,6 +1,6 @@
 const { ApolloServer } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { v1: uuid } = require('uuid')
 
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
@@ -103,19 +103,54 @@ const resolvers = {
 
       if(!foundAuthor) {
         foundAuthor = new Author({ name: args.author.name, born: args.author.born })
-        await foundAuthor.save()
+        try {
+          await foundAuthor.save()
+        } catch (error) {
+          throw new GraphQLError('Saving author failed', {
+            extensions: {
+              code: 'SAVING_AUTHOR_FAILED',
+              error
+            }
+          })
+        }       
       }
 
       const book = new Book({ ...args, author: foundAuthor })
-      return book.save()
+      
+      try {
+        await book.save()
+      } catch(error) {
+        throw new GraphQLError('Saving book failed', {
+          extensions: {
+            code: 'SAVING_BOOK_FAILED',
+            error
+          }
+        })
+      }
+
+      return book
     },
     editAuthor: async (root, args) => {
       const authorToUpdate = await Author.findOne({ name: args.name })
+      
       if(!authorToUpdate){
         return null
       }
+      
       authorToUpdate.born = args.born
-      return authorToUpdate.save()
+
+      try {
+        await authorToUpdate.save()
+      } catch (error) {
+        throw new GraphQLError('Saving author failed', {
+          extensions: {
+            code: 'SAVING_AUTHOR_FAILED',
+            error
+          }
+        })
+      }
+
+      return authorToUpdate
     }
   }
 }
