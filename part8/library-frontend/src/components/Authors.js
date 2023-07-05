@@ -7,7 +7,10 @@ const Authors = (props) => {
   const [born, setBorn] = useState('')
   const result = useQuery(ALL_AUTHORS)
   const [ changeBirthYear ] = useMutation(UPDATE_BIRTHYEAR, {
-    refetchQueries: [ { query: ALL_AUTHORS }]
+    refetchQueries: [ { query: ALL_AUTHORS }],
+    onError: (error) => {
+      console.log(error)
+    }
   })
 
   if(result.loading){
@@ -29,7 +32,8 @@ const Authors = (props) => {
         name: name,
         setBornTo: Number(born)
       }
-    })
+    }, 
+    )
 
     setName('')
     setBorn('')
