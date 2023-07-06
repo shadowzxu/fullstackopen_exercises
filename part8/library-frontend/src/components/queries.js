@@ -23,8 +23,8 @@ query {
 }
 `
 export const ALL_BOOKS = gql`
-query {
-  allBooks {
+query findBooksByGenre($genreToSearch: String) {
+  allBooks(genre: $genreToSearch) {
     title,
     author {
       name,
@@ -32,6 +32,11 @@ query {
     },
     published
   }
+}
+`
+export const ALL_GENRES = gql`
+query {
+  allGenres
 }
 `
 export const UPDATE_BIRTHYEAR = gql`

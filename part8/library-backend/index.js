@@ -63,6 +63,7 @@ type Query {
   bookCount: Int!
   allBooks(author: String, genre: String): [Book!]!
   allAuthors: [Author!]!
+  allGenres: [String]!
   me: User
 }
 
@@ -118,6 +119,12 @@ const resolvers = {
       }
 
       return booksForReturn
+    },
+    allGenres: async () => {
+      const books = await Book.find({})
+      let allGenresFromBooks = books.reduce((accumulateGenres, currentBook) => 
+        accumulateGenres.concat(currentBook.genres),[])
+      return [...new Set(allGenresFromBooks)]
     },
     me: (root, args, context) => {
       return context.currentUser
