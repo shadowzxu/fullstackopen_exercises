@@ -1,8 +1,9 @@
-import { useMutation } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import { useEffect, useState } from "react"
-import { LOGIN } from "./queries"
+import { LOGIN, ME } from "./queries"
 
 const LoginForm = ({ show, setToken, setPage }) => {
+  const me = useQuery(ME)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -18,6 +19,7 @@ const LoginForm = ({ show, setToken, setPage }) => {
       setToken(token)
       setPage('authors')
       localStorage.setItem('library-user-token', token)
+      me.refetch()
     }
   // eslint-disable-next-line
   }, [result.data])

@@ -39,6 +39,26 @@ query {
   allGenres
 }
 `
+export const ME = gql`
+query {
+  me {
+    username
+    favoriteGenre
+  }
+}
+`
+export const ALL_RECOMMANDATIONS = gql`
+query {
+  allRecommandations {
+    title
+    author {
+      name
+      born
+    }
+    published
+  }
+}
+`
 export const UPDATE_BIRTHYEAR = gql`
 mutation($name: String!, $setBornTo: Int!){
   editAuthor(name: $name, born: $setBornTo) {
