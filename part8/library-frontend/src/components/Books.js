@@ -1,29 +1,9 @@
 import { useQuery } from "@apollo/client"
-import { ALL_BOOKS, ALL_GENRES } from "./queries"
-import { useState } from "react"
+import { ALL_BOOKS } from "./queries"
+import { useEffect, useState } from "react"
 
-const Books = (props) => {
-  const [genreToSearch, setGenreToSearch] = useState(null)
-  const allBooks = useQuery(ALL_BOOKS, {
-    variables: {genreToSearch}
-  })
-  const allGenres = useQuery(ALL_GENRES)
-
-  if(allBooks.loading || allGenres.loading){
-    return <div>Loading</div>
-  }
-
-  if (!props.show) {
-    return null
-  }
-
-  const books = allBooks.data.allBooks
-  const genres = allGenres.data.allGenres
-
-  return (
-    <div>
-      <h2>books</h2>
-
+const BookTable = ({ books }) => (
+  <div>
       <table>
         <tbody>
           <tr>
@@ -31,19 +11,67 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author.name}</td>
-              <td>{a.published}</td>
+          {books.map((book) => (
+            <tr key={book.title}>
+              <td>{book.title}</td>
+              <td>{book.author.name}</td>
+              <td>{book.published}</td>
             </tr>
           ))}
         </tbody>
       </table>
+  </div>
+)
 
+const GenreButtonGruop = ({ genres, setGenreToSearch }) => {
+  const handleGenreBtnOnClick = (sGenreToSearch) => {
+    if(sGenreToSearch === "all"){
+      setGenreToSearch(null)
+    }
+    else{
+      setGenreToSearch(sGenreToSearch)
+    }
+  }
+  return (
+    <div>
       {genres.map((genre) => (
-        <button key={genre} onClick={() => setGenreToSearch(genre)}>{genre}</button>
+          <button key={genre} onClick={() => {handleGenreBtnOnClick(genre)}}>{genre}</button>
       ))}
+    </div>
+  )
+}
+
+const Books = ({ show }) => {
+  const [genreToSearch, setGenreToSearch] = useState(null)
+  const [genres, setGenres] = useState([])
+  const allBooks = useQuery(ALL_BOOKS)
+  const booksFilteredByGenre = useQuery(ALL_BOOKS, {
+    variables: {genreToSearch}
+  })
+
+  useEffect(() => {
+    if(allBooks.data){      
+      let allGenresFromBooks = allBooks.data.allBooks.reduce((accumulateGenres, currentBook) => 
+        accumulateGenres.concat(currentBook.genres),[])
+      
+      allGenresFromBooks = [...new Set(allGenresFromBooks)]
+      setGenres(["all", ...allGenresFromBooks])
+    }
+  }, [allBooks.data])
+
+  if(allBooks.loading || booksFilteredByGenre.loading){
+    return <div>Loading</div>
+  }
+
+  if (!show) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>books</h2>
+      <BookTable books={genreToSearch ? booksFilteredByGenre.data.allBooks : allBooks.data.allBooks} />
+      <GenreButtonGruop genres={genres} setGenreToSearch={setGenreToSearch} />
     </div>
   )
 }

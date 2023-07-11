@@ -14,7 +14,7 @@ mutation AddBook($title: String!, $author: AuthorInput!, $published: Int!, $genr
 }
 `
 export const ALL_AUTHORS = gql`
-query {
+query findAllAuthor {
   allAuthors {
     name,
     born,
@@ -30,17 +30,30 @@ query findBooksByGenre($genreToSearch: String) {
       name,
       born
     },
+    published,
+    genres
+  }
+}
+`
+export const FIND_BOOKS_BY_GENRE = gql`
+query findBooksByGenre($genreToSearch: String) {
+  allBooks(genre: $genreToSearch) {
+    title,
+    author {
+      name,
+      born
+    },
     published
   }
 }
 `
 export const ALL_GENRES = gql`
-query {
+query findAllGenre{
   allGenres
 }
 `
 export const ME = gql`
-query {
+query findUserInfo{
   me {
     username
     favoriteGenre
@@ -48,7 +61,7 @@ query {
 }
 `
 export const ALL_RECOMMANDATIONS = gql`
-query {
+query findAllRecommandations{
   allRecommandations {
     title
     author {
@@ -60,7 +73,7 @@ query {
 }
 `
 export const UPDATE_BIRTHYEAR = gql`
-mutation($name: String!, $setBornTo: Int!){
+mutation updateBirthYear($name: String!, $setBornTo: Int!){
   editAuthor(name: $name, born: $setBornTo) {
     name
     born
