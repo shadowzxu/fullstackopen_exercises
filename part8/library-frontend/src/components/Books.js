@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client"
-import { ALL_BOOKS } from "./queries"
+import { ALL_BOOKS, FIND_BOOKS_BY_GENRE } from "./queries"
 import { useEffect, useState } from "react"
 
 const BookTable = ({ books }) => (
@@ -45,7 +45,7 @@ const Books = ({ show }) => {
   const [genreToSearch, setGenreToSearch] = useState(null)
   const [genres, setGenres] = useState([])
   const allBooks = useQuery(ALL_BOOKS)
-  const booksFilteredByGenre = useQuery(ALL_BOOKS, {
+  const booksFilteredByGenre = useQuery(FIND_BOOKS_BY_GENRE, {
     variables: {genreToSearch}
   })
 
