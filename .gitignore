@@ -40,3 +40,6 @@ node_modules
 build
 .env
 .vscode
+
+# mongoDB playgrounds script
+mongodbplaygrounds
