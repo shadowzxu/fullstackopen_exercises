@@ -13,8 +13,8 @@ const resolvers = {
     born: (root) => root.born,
     id: (root) => root.id,
     bookCount: async (root) => {
-      const author = await Author.findOne({ name: root.name })
-      return (await Book.find({ author: author })).length
+      const author = await Author.findOne({ name: root.name }).populate('bookOf')
+      return author.bookOf.length
     }
   },
   Query: {
@@ -65,8 +65,8 @@ const resolvers = {
         })
       }
 
+      //create a new author if author is not found
       let foundAuthor = await Author.findOne({ name: args.author.name })
-
       if(!foundAuthor) {
         foundAuthor = new Author({ name: args.author.name, born: args.author.born })
         try {
@@ -78,17 +78,33 @@ const resolvers = {
               error
             }
           })
-        }       
+        } 
       }
 
+      //create a new book
       const book = new Book({ ...args, author: foundAuthor })
-      
       try {
         await book.save()
       } catch(error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
             code: 'SAVING_BOOK_FAILED',
+            error
+          }
+        })
+      }
+
+      //update book of author
+      const authorToUpdate = await Author.findOne({ name: foundAuthor.name })
+      
+      authorToUpdate.bookOf = authorToUpdate.bookOf.concat(book._id)
+
+      try {
+        await authorToUpdate.save()
+      } catch (error) {
+        throw new GraphQLError('Saving author failed', {
+          extensions: {
+            code: 'SAVING_AUTHOR_FAILED',
             error
           }
         })
