@@ -12,8 +12,8 @@ type Token {
 type Author {
   name: String!
   born: Int
-  id: ID!
   bookCount: Int!
+  id: ID!
 }
 
 input AuthorInput {
