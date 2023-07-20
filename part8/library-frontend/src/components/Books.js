@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client"
-import { ALL_BOOKS, FIND_BOOKS_BY_GENRE } from "./queries"
-import { useEffect, useState } from "react"
+import { ALL_BOOKS } from "./queries"
+import { useState } from "react"
 
 const BookTable = ({ books }) => (
   <div>
@@ -23,43 +23,20 @@ const BookTable = ({ books }) => (
   </div>
 )
 
-const GenreButtonGruop = ({ genres, setGenreToSearch }) => {
-  const handleGenreBtnOnClick = (sGenreToSearch) => {
-    if(sGenreToSearch === "all"){
-      setGenreToSearch(null)
-    }
-    else{
-      setGenreToSearch(sGenreToSearch)
-    }
-  }
-  return (
-    <div>
-      {genres.map((genre) => (
-          <button key={genre} onClick={() => {handleGenreBtnOnClick(genre)}}>{genre}</button>
-      ))}
-    </div>
-  )
-}
-
 const Books = ({ show }) => {
-  const [genreToSearch, setGenreToSearch] = useState(null)
-  const [genres, setGenres] = useState([])
-  const allBooks = useQuery(ALL_BOOKS)
-  const booksFilteredByGenre = useQuery(FIND_BOOKS_BY_GENRE, {
-    variables: {genreToSearch}
+  const [genre, setGenre] = useState(null)
+  
+  const allBookQuery = useQuery(ALL_BOOKS, {
+    variables: { genre: null }
   })
 
-  useEffect(() => {
-    if(allBooks.data){      
-      let allGenresFromBooks = allBooks.data.allBooks.reduce((accumulateGenres, currentBook) => 
-        accumulateGenres.concat(currentBook.genres),[])
-      
-      allGenresFromBooks = [...new Set(allGenresFromBooks)]
-      setGenres(["all", ...allGenresFromBooks])
-    }
-  }, [allBooks.data])
+  const genreBookQuery = useQuery(ALL_BOOKS, {
+    variables: { genre },
+    skip: !genre,
+    // pollInterval: 2000
+  })
 
-  if(allBooks.loading || booksFilteredByGenre.loading){
+  if(allBookQuery.loading || genreBookQuery.loading){
     return <div>Loading</div>
   }
 
@@ -67,11 +44,24 @@ const Books = ({ show }) => {
     return null
   }
 
+  const allBooks = allBookQuery.data.allBooks
+
+  const genres = [...new Set(allBooks.reduce((s, b) => s.concat(b.genres), []))]
+  
+  const books = genre ? genreBookQuery.data.allBooks : allBooks
+
   return (
     <div>
       <h2>books</h2>
-      <BookTable books={genreToSearch ? booksFilteredByGenre.data.allBooks : allBooks.data.allBooks} />
-      <GenreButtonGruop genres={genres} setGenreToSearch={setGenreToSearch} />
+      <BookTable books={ books } />
+      <div>
+        {genres.map((g) => (
+          <button onClick={() => setGenre(g)} key={g}>
+            {g===genre ? <strong>{g}</strong> : g}
+          </button>
+        ))}
+        <button onClick={() => setGenre(null)}>{!genre ? <strong>all</strong> : 'all'}</button>
+      </div>
     </div>
   )
 }

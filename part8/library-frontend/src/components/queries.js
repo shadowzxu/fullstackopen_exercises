@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 const BOOK_DETAILS = gql`
 fragment BookDetails on Book {
+  id
   title
   published
   genres
@@ -31,12 +32,13 @@ query findAllAuthor {
 }
 `
 export const ALL_BOOKS = gql`
-query findAllBooks {
-  allBooks {
-    ...BookDetails
+  query allBooks($genre: String){
+    allBooks(genre: $genre)   {
+      ...BookDetails
+    }
   }
-}
-${BOOK_DETAILS}
+
+  ${BOOK_DETAILS}
 `
 export const FIND_BOOKS_BY_GENRE = gql`
 query findBooksByGenre($genreToSearch: String) {
