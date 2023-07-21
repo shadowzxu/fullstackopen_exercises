@@ -1,26 +1,26 @@
 import { useQuery } from "@apollo/client"
-import { ALL_RECOMMANDATIONS, ME } from "./queries"
-import { useEffect } from "react"
+import { ALL_BOOKS, ME } from "./queries"
 
 const Recommandation = ({ show }) => {
-  const me = useQuery(ME)
-  const allRecommandations = useQuery(ALL_RECOMMANDATIONS)
+  const meQuery = useQuery(ME)
 
-  useEffect(() => {
-    allRecommandations.refetch()
-  // eslint-disable-next-line
-  }, [me.data])
+  const genre = (meQuery.data && meQuery.data.me) ? meQuery.data.me.favoriteGenre : null
 
-  if(!show){
+  const bookQuery = useQuery(ALL_BOOKS, {
+    variables: { genre },
+    skip: !genre
+  })
+
+  if(!show || meQuery.loading || bookQuery.loading){
     return null
   }
 
-  const recommandedBooks = allRecommandations.data.allRecommandations
+  const books = bookQuery.data.allBooks
 
   return (
     <div>
       <h2>Recommandation</h2>
-      <p>books in your favorite genre <strong>{me.data.me.favoriteGenre}</strong></p>
+      <p>books in your favorite genre <strong>{genre}</strong></p>
       <table>
         <tbody>
           <tr>
@@ -28,7 +28,7 @@ const Recommandation = ({ show }) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {recommandedBooks.map((a) => (
+          {books.map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
