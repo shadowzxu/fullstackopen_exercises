@@ -33,9 +33,7 @@ type Query {
   authorCount: Int!
   bookCount: Int!
   allBooks(author: String, genre: String): [Book!]!
-  allRecommandations: [Book!]!
   allAuthors: [Author!]!
-  allGenres: [String]!
   me: User
 }
 

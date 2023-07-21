@@ -42,20 +42,6 @@ const Query = {
 
     return Book.find(query).populate('author')
   },
-  allRecommandations: async (root, args, context) => {
-    if(!context.currentUser){
-      return []
-    }
-    const favoriteGenre = context.currentUser.favoriteGenre
-    let booksForReturn = await Book.find({}).populate('author')
-    return booksForReturn.filter(b => b.genres.includes(favoriteGenre))
-  },
-  allGenres: async () => {
-    const books = await Book.find({})
-    let allGenresFromBooks = books.reduce((accumulateGenres, currentBook) => 
-      accumulateGenres.concat(currentBook.genres),[])
-    return [...new Set(allGenresFromBooks)]
-  },
   me: (root, args, context) => {
     return context.currentUser
   }
@@ -156,26 +142,26 @@ const Mutation = {
         })
       })
     },
-    login: async (root, args) => {
-      const user = await User.findOne({ username: args.username })
+  login: async (root, args) => {
+    const user = await User.findOne({ username: args.username })
 
-      if( !user || args.password !== 'secret') {
-        throw new GraphQLError('wrong credentials', {
-          extensions: {
-            code: 'BAD_USER_INPUT'
-          }
-        })
-      }
+    if( !user || args.password !== 'secret') {
+      throw new GraphQLError('wrong credentials', {
+        extensions: {
+          code: 'BAD_USER_INPUT'
+        }
+      })
+    }
 
-      const userForToken = {
-        username: user.username,
-        id: user._id
-      }
+    const userForToken = {
+      username: user.username,
+      id: user._id
+    }
 
-      console.log(userForToken)
+    console.log(userForToken)
 
-      return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
-    },
+    return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
+  },
 }
 
 const Subscription = {
