@@ -1,3 +1,7 @@
+import { isNotNumber } from "./utils";
+
+type ExerciseData = number[];
+
 interface Result { 
   periodLength: number;
   trainingDays: number;
@@ -8,8 +12,22 @@ interface Result {
   average: number;
 }
 
-const calculateExercises = (hours: number[]): Result => {
-  const TARGET = 5;
+const parseArgument = (args: string[]): ExerciseData => {
+  let index: number = 2, exerciseData: ExerciseData = [];
+  while(args[index]){
+    if(isNotNumber(args[index])) {
+      throw new Error('Provided values were not numbers!');
+    }
+    exerciseData.push(Number(args[index]));
+    index++;
+  }
+
+  return exerciseData;
+}
+
+const calculateExercises = (exerciseData: number[]): Result => {
+  const target = exerciseData[0];
+  const hours = exerciseData.slice(1);
   const periodLength = hours.length;
   const trainingDays = hours.filter(day => day > 0).length;
   const averageHours = hours.reduce((total, day) => total + day, 0) / hours.length;
@@ -32,12 +50,21 @@ const calculateExercises = (hours: number[]): Result => {
   return { 
     periodLength: periodLength,
     trainingDays: trainingDays,
-    success: trainingDays >= TARGET,
+    success: trainingDays >= target,
     rating: rating,
     ratingDescription: ratingDescription,
-    target: TARGET,
+    target: target,
     average: averageHours
   }
 }
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1]))
+try {
+  const exerciseData = parseArgument(process.argv);
+  console.log(calculateExercises(exerciseData));
+} catch(error: unknown) {
+  let errorMessage = 'Something bad happened.';
+  if (error instanceof Error) {
+    errorMessage += ' Error: ' + error.message;
+  }
+  console.log(errorMessage);
+}
