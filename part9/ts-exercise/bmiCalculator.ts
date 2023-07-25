@@ -16,13 +16,13 @@ const parseArgument = (args: string[]): Input => {
   }
 }
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   const bmi = weight / (Math.pow(height/100, 2));
   let status = 'Normal';
 
   if(bmi < 18.5) status = 'Underweight';
   if(bmi > 24.9) status = 'Overweight';
-  return `${status} (${height} ${weight})`;
+  return `${status}`;
 };
 
 try {
