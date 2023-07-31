@@ -1,7 +1,3 @@
-import { isNotNumber } from "./utils";
-
-type ExerciseData = number[];
-
 interface Result { 
   periodLength: number;
   trainingDays: number;
@@ -12,20 +8,7 @@ interface Result {
   average: number;
 }
 
-const parseArgument = (args: string[]): ExerciseData => {
-  let index: number = 2, exerciseData: ExerciseData = [];
-  while(args[index]){
-    if(isNotNumber(args[index])) {
-      throw new Error('Provided values were not numbers!');
-    }
-    exerciseData.push(Number(args[index]));
-    index++;
-  }
-
-  return exerciseData;
-}
-
-const calculateExercises = (exerciseData: number[]): Result => {
+export const calculateExercises = (exerciseData: number[]): Result => {
   const target = exerciseData[0];
   const hours = exerciseData.slice(1);
   const periodLength = hours.length;
@@ -56,15 +39,4 @@ const calculateExercises = (exerciseData: number[]): Result => {
     target: target,
     average: averageHours
   }
-}
-
-try {
-  const exerciseData = parseArgument(process.argv);
-  console.log(calculateExercises(exerciseData));
-} catch(error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
-  }
-  console.log(errorMessage);
 }
