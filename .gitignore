@@ -43,3 +43,6 @@ build
 
 # mongoDB playgrounds script
 mongodbplaygrounds
+
+# ingore patientor frontend fork
+part9/patientor
