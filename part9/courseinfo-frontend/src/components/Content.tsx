@@ -1,16 +1,15 @@
-import { Course } from "../App";
+import { CoursePart } from "../App";
+import Part from "./Part";
 
 interface ContentProp {
-  courses: Course[];
+  courses: CoursePart[];
 }
 
 const Content = (props: ContentProp): JSX.Element => {
   return (
     <div>
       {props.courses.map((course) => (
-        <p key={course.name}>
-          {course.name} {course.exerciseCount}
-        </p>
+        <Part key={course.name} part={course} />
       ))}
     </div>
   )
