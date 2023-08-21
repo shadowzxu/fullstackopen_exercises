@@ -1,36 +1,7 @@
 import Content from "./components/Content";
 import Header from "./components/Header";
 import Total from "./components/Total";
-
-interface CoursePartBase {
-  name: string;
-  exerciseCount: number;
-}
-
-interface CoursePartDetail extends CoursePartBase {
-  description: string;
-}
-
-interface CoursePartBasic extends CoursePartDetail {
-  kind: "basic"
-}
-
-interface CoursePartGroup extends CoursePartBase {
-  groupProjectCount: number;
-  kind: "group"
-}
-
-interface CoursePartBackground extends CoursePartDetail {
-  backgroundMaterial: string;
-  kind: "background"
-}
-
-interface CoursePartSpecial extends CoursePartDetail {
-  requirements: string[];
-  kind: "special";
-}
-
-export type CoursePart = CoursePartBasic | CoursePartGroup | CoursePartBackground | CoursePartSpecial;
+import { CoursePart } from "./interfaces/CoursePart";
 
 const App = () => {
   const courseName = "Half Stack application development";

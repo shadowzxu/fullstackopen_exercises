@@ -1,4 +1,4 @@
-import { CoursePart } from "../App";
+import { CoursePart } from "../interfaces/CoursePart";
 import Part from "./Part";
 
 interface ContentProp {
