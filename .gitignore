@@ -44,5 +44,6 @@ build
 # mongoDB playgrounds script
 mongodbplaygrounds
 
-# ingore patientor frontend fork
+# ignore patientor frontend fork and flight-diary backend
 part9/patientor
+part9/flight-diary
