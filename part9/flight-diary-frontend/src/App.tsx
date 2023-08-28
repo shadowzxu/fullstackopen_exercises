@@ -1,5 +1,5 @@
 import Content from "./components/Content";
-import { DiaryEntry, NewDiary } from "./types";
+import { DiaryEntry, NewDiary, Visibility, Weather } from "./types";
 import { useEffect, useState } from "react";
 import { createDiary, getAllDiaries } from "./services/diaryService";
 import Notification from "./components/Notification";
@@ -8,9 +8,9 @@ function App() {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
 
   const [date, setDate] = useState("2023-02-02");
-  const [visibility, setVisibility] = useState("great");
-  const [weather, setWeather] = useState("sunny");
-  const [comment, setComment] = useState("nice flight but a shaky landing.");
+  const [visibility, setVisibility] = useState<Visibility>(Visibility.None);
+  const [weather, setWeather] = useState<Weather>(Weather.None);
+  const [comment, setComment] = useState("A well typed flight!");
 
   const [message, setMessage] = useState({ content: null, type:'INFO' });
 
@@ -32,8 +32,8 @@ function App() {
         setDiaries(diaries.concat(data));
 
         setDate('');
-        setVisibility('');
-        setWeather('');
+        setVisibility(Visibility.None);
+        setWeather(Weather.None);
         setComment('');
       })
       .catch(error => {
@@ -50,11 +50,22 @@ function App() {
       <Notification message = {message.content} type = {message.type} /><br/>
       <form onSubmit={diaryCreation}>
         <label>date: </label>
-        <input value={date} onChange={(event) => setDate(event.target.value)} /><br/>
-        <label>visibility: </label>
-        <input value={visibility} onChange={(event) => setVisibility(event.target.value)} /><br/>
-        <label>weather: </label>
-        <input value={weather} onChange={(event) => setWeather(event.target.value)} /><br/>
+        <input type="date" value={date} onChange={(event) => setDate(event.target.value)} /><br/>
+        <div>
+          <label>visibility: </label>
+          <input type="radio" name="visibility_filter" onChange={() => setVisibility(Visibility.Great)}/>{Visibility.Great}
+          <input type="radio" name="visibility_filter" onChange={() => setVisibility(Visibility.Good)}/>{Visibility.Good}
+          <input type="radio" name="visibility_filter" onChange={() => setVisibility(Visibility.Ok)}/>{Visibility.Ok}
+          <input type="radio" name="visibility_filter" onChange={() => setVisibility(Visibility.Poor)}/>{Visibility.Poor}
+        </div>
+        <div>
+          <label>weather: </label>
+          <input type="radio" name="weather_filter" onChange={() => setWeather(Weather.Cloudy)}/>{Weather.Cloudy}
+          <input type="radio" name="weather_filter" onChange={() => setWeather(Weather.Rainy)}/>{Weather.Rainy}
+          <input type="radio" name="weather_filter" onChange={() => setWeather(Weather.Stormy)}/>{Weather.Stormy}
+          <input type="radio" name="weather_filter" onChange={() => setWeather(Weather.Sunny)}/>{Weather.Sunny}
+          <input type="radio" name="weather_filter" onChange={() => setWeather(Weather.Windy)}/>{Weather.Windy}
+        </div>
         <label>comment: </label>
         <input value={comment} onChange={(event) => setComment(event.target.value)} /><br/><br/>
         <button type='submit'>add</button>
