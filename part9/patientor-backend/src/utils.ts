@@ -1,4 +1,4 @@
-import { Gender, NewPatientEntry } from "./types";
+import { Entry, Gender, NewPatient } from "./types";
 
 /**
  * type guards
@@ -54,24 +54,29 @@ const parseGender = (gender: unknown): Gender => {
   return gender;
 };
 
+const parseEntries = (): Entry[] => {
+  return [];
+}
+
 /**
  * Parse object to patient utility type: NewPatientEntry
  * @param object 
  * @returns 
  */
-export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
+export const toNewPatientEntry = (object: unknown): NewPatient => {
   if(!object || typeof object !== 'object') {
     throw new Error('Incorrect or missing data');
   }
 
   if('name' in object && 'dateOfBirth' in object && 'ssn' in object &&
-      'occupation' in object && 'gender' in object){
-    const newEntry: NewPatientEntry = {
+      'occupation' in object && 'gender' in object && 'entries' in object){
+    const newEntry: NewPatient = {
       name: parseName(object.name),
       dateOfBirth: parseDateOfBirth(object.dateOfBirth),
       ssn: parseSsn(object.ssn),
       occupation: parseOccupation(object.occupation),
-      gender: parseGender(object.gender)
+      gender: parseGender(object.gender),
+      entries: parseEntries()
     };
   
     return newEntry;
